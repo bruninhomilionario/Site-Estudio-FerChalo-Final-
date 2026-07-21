@@ -8,6 +8,15 @@
 
   /* ---------- Lenis smooth scroll + GSAP ---------- */
   gsap.registerPlugin(ScrollTrigger);
+  // Mobile browsers resize the viewport when the address bar hides/shows on
+  // scroll; without this, ScrollTrigger recalculates mid-scroll and the page jitters.
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
+  // Web fonts swap in after first paint and can change section heights,
+  // leaving ScrollTrigger's cached positions stale — refresh once fonts settle.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+  }
 
   var lenis = new Lenis({
     duration: 1.2,

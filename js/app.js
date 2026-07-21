@@ -18,6 +18,11 @@
     document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
   }
 
+  /* ---------- Motion & device preferences ---------- */
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var isMobile = window.matchMedia("(max-width: 767px)").matches;
+  var isFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   var lenis = new Lenis({
     duration: 1.2,
     easing: function (t) { return Math.min(1, 1.001 - Math.pow(2, -10 * t)); },
@@ -116,27 +121,145 @@
     });
   });
 
-  /* ---------- Section reveal on scroll ---------- */
-  var revealSelector = [
-    ".section-label", ".section-heading", ".section-body", ".split-media",
-    ".check-list", ".services-grid", ".portfolio-filters",
-    ".masonry-grid", ".google-rating-bar", ".reviews-marquee",
-    ".contact-grid", ".cta-heading", ".cta-text", ".hero-ctas"
-  ].join(",");
+  /* ---------- "Falling into place" scroll reveals ---------- */
+  // Distance/duration/blur all scale down on mobile so the motion stays quick
+  // and cheap on low-power devices, per the mobile + performance requirements.
+  var distScale = isMobile ? 0.55 : 1;
+  var durScale = isMobile ? 0.75 : 1;
+  var blurPx = isMobile ? 0 : 8;
 
-  document.querySelectorAll("[data-fade], .cta-banner").forEach(function (section) {
-    var items = section.querySelectorAll(revealSelector);
-    ScrollTrigger.create({
-      trigger: section,
-      start: "top 80%",
-      once: true,
-      onEnter: function () {
-        items.forEach(function (el, idx) {
-          gsap.delayedCall(idx * 0.12, function () { el.classList.add("reveal-ready"); });
-        });
-      }
+  function clearAfter(targets) {
+    return function () { gsap.set(targets, { clearProps: "transform,filter,opacity" }); };
+  }
+
+  // Reduced motion: never hide anything — content stays at its natural, fully
+  // visible CSS state. (No gsap.set hiding call is made anywhere below either.)
+  if (!reduceMotion) {
+    document.querySelectorAll("[data-fade], .cta-banner").forEach(function (section) {
+      var groups = [
+        { els: section.querySelectorAll(".section-label"), from: { y: -22 * distScale }, duration: 0.6, ease: "power2.out" },
+        { els: section.querySelectorAll(".section-heading, .cta-heading"), from: { y: -56 * distScale, rotation: -2 }, duration: 1 * durScale, ease: "back.out(1.25)" },
+        { els: section.querySelectorAll(".section-body, .cta-text, .check-list, .tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
+        { els: section.querySelectorAll(".portfolio-filters"), from: { y: -20 * distScale }, duration: 0.6 * durScale, ease: "power2.out" },
+        { els: section.querySelectorAll(".split-media, .service-media, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
+        { els: section.querySelectorAll(".service-card, .contact-info, .google-rating-bar"), from: { y: -46 * distScale, scale: 0.95 }, duration: 0.9 * durScale, ease: "back.out(1.25)", stagger: 0.12 },
+        { els: section.querySelectorAll(".masonry-grid .portfolio-item"), from: { y: -60 * distScale, scale: 0.94, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 0.9 * durScale, ease: "back.out(1.2)", stagger: 0.07 },
+        { els: section.querySelectorAll(".btn"), from: { y: -18 * distScale }, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }
+      ].filter(function (g) { return g.els.length; });
+
+      if (!groups.length) return;
+
+      groups.forEach(function (g) {
+        gsap.set(g.els, Object.assign({ opacity: 0 }, g.from));
+      });
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 82%",
+        once: true,
+        onEnter: function () {
+          var tl = gsap.timeline();
+          groups.forEach(function (g, idx) {
+            var toVars = {
+              opacity: 1, y: 0, scale: 1, rotation: 0,
+              duration: g.duration, ease: g.ease, stagger: g.stagger || 0,
+              onComplete: clearAfter(g.els)
+            };
+            if (g.from.filter) toVars.filter = "blur(0px)";
+            tl.to(g.els, toVars, idx === 0 ? 0 : "-=" + Math.min(g.duration * 0.5, 0.4));
+          });
+        }
+      });
     });
-  });
+  }
+
+  /* ---------- Hero entrance sequence ---------- */
+  (function initHeroEntrance() {
+    var heroWords = document.querySelectorAll(".hero-heading span");
+    var heroTargets = {
+      decor: document.querySelector(".hero-decor"),
+      label: document.querySelector("#hero .section-label"),
+      tagline: document.querySelector(".hero-tagline"),
+      badges: document.querySelectorAll(".trust-badges li"),
+      ctas: document.querySelectorAll(".hero-ctas .btn")
+    };
+    var whatsapp = document.getElementById("whatsapp-float");
+
+    if (reduceMotion) {
+      if (whatsapp) gsap.set(whatsapp, { opacity: 1, clearProps: "transform" });
+      return;
+    }
+
+    gsap.set(heroTargets.decor, { opacity: 0, scale: 0.92 });
+    gsap.set(heroTargets.label, { opacity: 0, y: -22 });
+    gsap.set(heroWords, { opacity: 0, y: -60 * distScale, rotation: -3 });
+    gsap.set(heroTargets.tagline, { opacity: 0, y: -26 * distScale });
+    gsap.set(heroTargets.badges, { opacity: 0, y: -14 });
+    gsap.set(heroTargets.ctas, { opacity: 0, y: -18 });
+    if (whatsapp) gsap.set(whatsapp, { opacity: 0, scale: 0.6, y: 20 });
+
+    var tl = gsap.timeline({ delay: 0.15 });
+    tl.to(heroTargets.decor, { opacity: 1, scale: 1, duration: 1.1 * durScale, ease: "power2.out" }, 0)
+      .to(heroTargets.label, { opacity: 1, y: 0, duration: 0.6 * durScale, ease: "power2.out" }, 0.15)
+      .to(heroWords, { opacity: 1, y: 0, rotation: 0, duration: 0.8 * durScale, ease: "back.out(1.3)", stagger: 0.07 }, 0.3)
+      .to(heroTargets.tagline, { opacity: 1, y: 0, duration: 0.7 * durScale, ease: "power2.out" }, "-=0.35")
+      .to(heroTargets.badges, { opacity: 1, y: 0, duration: 0.5 * durScale, ease: "power2.out", stagger: 0.06 }, "-=0.3")
+      .to(heroTargets.ctas, { opacity: 1, y: 0, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }, "-=0.35")
+      .eventCallback("onComplete", function () {
+        gsap.set([heroTargets.decor, heroTargets.label, heroWords, heroTargets.tagline, heroTargets.badges, heroTargets.ctas], { clearProps: "transform,opacity" });
+        if (whatsapp) {
+          gsap.to(whatsapp, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.4)", onComplete: clearAfter(whatsapp) });
+        }
+      });
+  })();
+
+  /* ---------- Subtle scroll parallax (selected decorative/foreground elements) ---------- */
+  if (!reduceMotion) {
+    var parallaxAmt = isMobile ? 18 : 45;
+    var heroDecorEl = document.querySelector(".hero-decor");
+    if (heroDecorEl) {
+      gsap.to(heroDecorEl, {
+        y: parallaxAmt,
+        ease: "none",
+        scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true }
+      });
+    }
+    var portraitImg = document.querySelector(".portrait-placeholder img");
+    if (portraitImg) {
+      gsap.to(portraitImg, {
+        y: -parallaxAmt * 0.6,
+        ease: "none",
+        scrollTrigger: { trigger: "#sobre", start: "top bottom", end: "bottom top", scrub: true }
+      });
+    }
+  }
+
+  /* ---------- Button interactions: hover scale, magnetic follow, press feedback ---------- */
+  (function initButtonInteractions() {
+    var magnetic = !reduceMotion && !isMobile && isFinePointer;
+    if (!magnetic) return; // mobile/touch/reduced-motion rely on the plain CSS :hover/:active states
+
+    document.querySelectorAll(".btn").forEach(function (btn) {
+      btn.addEventListener("mouseenter", function () {
+        gsap.to(btn, { scale: 1.04, duration: 0.3, ease: "power2.out" });
+      });
+      btn.addEventListener("mousemove", function (e) {
+        var rect = btn.getBoundingClientRect();
+        var relX = e.clientX - rect.left - rect.width / 2;
+        var relY = e.clientY - rect.top - rect.height / 2;
+        gsap.to(btn, { x: relX * 0.15, y: relY * 0.3, duration: 0.35, ease: "power2.out" });
+      });
+      btn.addEventListener("mouseleave", function () {
+        gsap.to(btn, { x: 0, y: 0, scale: 1, duration: 0.45, ease: "power2.out" });
+      });
+      btn.addEventListener("mousedown", function () {
+        gsap.to(btn, { scale: 0.96, duration: 0.15, ease: "power2.out" });
+      });
+      btn.addEventListener("mouseup", function () {
+        gsap.to(btn, { scale: 1.04, duration: 0.2, ease: "power2.out" });
+      });
+    });
+  })();
 
   /* ---------- Animated counters ---------- */
   var counters = document.querySelectorAll(".counter");

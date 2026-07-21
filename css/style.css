@@ -246,11 +246,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   transition: transform 0.35s var(--ease), background 0.35s var(--ease), color 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
 .btn-primary { background: var(--gold-fill); color: var(--ink); box-shadow: 0 8px 30px -8px rgba(212,175,55,0.5); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px -6px rgba(212,175,55,0.65); }
+.btn-primary:hover { box-shadow: 0 14px 36px -6px rgba(212,175,55,0.65); }
 .btn-secondary { border: 1px solid rgba(33,28,21,0.3); color: var(--ink); }
-.btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
 .btn-outline { border: 1px solid var(--gold); color: var(--gold); }
-.btn-outline:hover { background: var(--gold-fill); color: var(--ink); transform: translateY(-2px); }
+.btn-outline:hover { background: var(--gold-fill); color: var(--ink); }
+/* Baseline hover/press feedback; JS adds a magnetic follow on top for fine pointers. */
+.btn:active { transform: scale(0.96); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { transform: scale(1.03); }
+}
 
 .ripple { }
 .ripple-circle {
@@ -281,6 +286,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   margin-bottom: 18px;
 }
 .section-label.center { display: block; text-align: center; }
+.text-flourish { width: 130px; height: 22px; display: block; margin-bottom: 14px; }
 .section-heading {
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   margin-bottom: 24px;
@@ -374,6 +380,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 
 .portrait-frame {
   position: relative;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 18px;
@@ -404,6 +411,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 .portrait-caption {
   display: block;
+  position: relative;
+  z-index: 1;
   text-align: center;
   margin-top: 16px;
   font-size: 0.85rem;
@@ -725,34 +734,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 #back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
 #back-to-top:hover { border-color: var(--gold); }
-
-/* ============ Scroll reveal base ============ */
-[data-fade] .section-label,
-[data-fade] .section-heading,
-[data-fade] .section-body,
-[data-fade] .split-media,
-[data-fade] .check-list,
-[data-fade] .services-grid,
-[data-fade] .portfolio-filters,
-[data-fade] .masonry-grid,
-[data-fade] .google-rating-bar,
-[data-fade] .reviews-marquee,
-[data-fade] .contact-grid,
-.cta-banner .cta-heading,
-.cta-banner .cta-text,
-.cta-banner .hero-ctas {
-  opacity: 0;
-  transform: translateY(36px);
-}
-[data-fade] .enter-left { transform: translateX(-60px); }
-[data-fade] .enter-right { transform: translateX(60px); }
-[data-fade] .enter-scale { transform: scale(0.92) translateY(20px); }
-
-.reveal-ready {
-  opacity: 1 !important;
-  transform: translateY(0) scale(1) !important;
-  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
-}
 
 /* ============ Responsive ============ */
 @media (max-width: 1080px) {

@@ -174,7 +174,7 @@
   }
 
   // Reviews — slow, steady pace long enough per card for a visitor to read the text.
-  initMarquee(document.getElementById("reviews-marquee"), document.getElementById("reviews-track"), 9);
+  initMarquee(document.getElementById("reviews-marquee"), document.getElementById("reviews-track"), 13);
 
   // Service showcases (Tatuagens / Piercings) — calm photo-reel pace.
   document.querySelectorAll(".service-media-marquee").forEach(function (viewport) {

@@ -24,7 +24,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: auto; }
+html {
+  scroll-behavior: auto;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  max-width: 100%;
+}
 
 body {
   background: var(--bg);
@@ -33,6 +38,8 @@ body {
   font-weight: 300;
   line-height: 1.6;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
+  max-width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -274,8 +281,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   margin-bottom: 18px;
 }
 .section-label.center { display: block; text-align: center; }
-.label-with-icon { display: inline-flex; align-items: center; gap: 8px; }
-.label-icon { width: 30px; height: 15px; flex-shrink: 0; }
 .section-heading {
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   margin-bottom: 24px;
@@ -414,7 +419,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   font-size: 0.95rem;
 }
 .check-list li::before {
-  content: 'âœ“';
+  content: '✓';
   position: absolute;
   left: 0;
   color: var(--gold);
@@ -790,6 +795,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 
 @media (max-width: 640px) {
   .section { padding: 90px 6vw; }
+  .reviews-marquee { margin: 0 -6vw 20px; padding: 4px 6vw; }
   .masonry-grid { grid-template-columns: 1fr; }
   .check-list.two-col { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }

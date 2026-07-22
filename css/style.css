@@ -10,7 +10,7 @@
   --sand-beige: #E4D8C8;
   --deep-burgundy: #7A2435;
   --ruby-burgundy: #A3344B;
-  --antique-gold: #B8925A;
+  --antique-gold: #A3344B; /* gold retired in favor of red per request — same value as ruby-burgundy */
   --warm-white: #F7F3ED;
   --soft-black: #19171A;
   --warm-gray: #827A73;
@@ -25,8 +25,10 @@
   --gray: #C7BEB5;
   --gray-dim: #8F8983;
   --gold: var(--antique-gold);
-  --gold-text: var(--antique-gold);
-  --gold-soft: rgba(184, 146, 90, 0.3);
+  /* Small text (labels/captions) needs stronger contrast on dark bg than ruby
+     alone provides — use a brighter red specifically for that case. */
+  --gold-text: #D9536B;
+  --gold-soft: rgba(163, 52, 75, 0.3);
   --accent: var(--deep-burgundy);
   --accent-hover: var(--ruby-burgundy);
   --accent-text: var(--warm-white);
@@ -283,7 +285,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   font-size: 0.8rem;
   transition: background 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
 }
-.nav-cta:hover { background: var(--ruby-burgundy); border-color: var(--ruby-burgundy); box-shadow: 0 8px 22px -8px rgba(37,211,102,0.5); }
+.nav-cta:hover { background: var(--ruby-burgundy); border-color: var(--ruby-burgundy); box-shadow: 0 8px 22px -8px rgba(163,52,75,0.5); }
 
 .nav-toggle {
   display: none;
@@ -330,11 +332,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 /* Baseline hover/press feedback; JS adds a magnetic follow on top for fine pointers. */
 .btn:active { transform: scale(0.96); }
 
-/* Brand-tinted glow so the "direct action" buttons (booking / social) stand out */
-.btn-whatsapp:hover { box-shadow: 0 12px 32px -8px rgba(37,211,102,0.5); border-color: #25D366; }
-.btn-whatsapp.btn-primary { box-shadow: 0 8px 26px -8px rgba(37,211,102,0.4); }
-.btn-whatsapp.btn-primary:hover { box-shadow: 0 14px 34px -6px rgba(37,211,102,0.55); }
-.btn-instagram:hover { box-shadow: 0 12px 32px -8px rgba(193,53,132,0.45); border-color: #C13584; background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF); color: #fff; }
+/* Red glow (same ruby-burgundy as the rest of the site) so the "direct
+   action" buttons (booking / social) still stand out on hover. */
+.btn-whatsapp:hover { box-shadow: 0 12px 32px -8px rgba(163,52,75,0.5); border-color: var(--ruby-burgundy); }
+.btn-whatsapp.btn-primary { box-shadow: 0 8px 26px -8px rgba(163,52,75,0.4); }
+.btn-whatsapp.btn-primary:hover { box-shadow: 0 14px 34px -6px rgba(163,52,75,0.55); }
+.btn-instagram:hover { box-shadow: 0 12px 32px -8px rgba(163,52,75,0.45); border-color: var(--ruby-burgundy); background: var(--ruby-burgundy); color: var(--warm-white); }
 @media (hover: hover) and (pointer: fine) {
   .btn:hover { transform: scale(1.03); }
 }

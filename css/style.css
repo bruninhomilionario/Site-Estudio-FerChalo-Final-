@@ -57,6 +57,11 @@
   --gold-text: var(--deep-burgundy);
   color: var(--ink);
 }
+/* These two read as plain white with warm-ivory — deepen to the more visibly
+   warm sand-beige tone so they clearly stay in the site's palette. */
+#avaliacoes, #contato {
+  --bg: var(--sand-beige);
+}
 
 /* Dark-section variants (services deeper charcoal, portfolio near-black cinematic) */
 #servicos { --bg: var(--charcoal); }

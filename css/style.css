@@ -206,13 +206,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 .nav-menu a:not(.nav-cta):hover::after { width: 100%; }
 .nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border: 1px solid var(--gold);
   padding: 9px 20px;
   border-radius: 999px;
   font-size: 0.8rem;
-  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+  transition: background 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s var(--ease);
 }
-.nav-cta:hover { background: var(--gold-fill); color: var(--ink); }
+.nav-cta:hover { background: var(--gold-fill); color: var(--ink); box-shadow: 0 8px 22px -8px rgba(37,211,102,0.5); }
 
 .nav-toggle {
   display: none;
@@ -238,13 +241,15 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
   padding: 16px 34px;
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.03em;
-  transition: transform 0.35s var(--ease), background 0.35s var(--ease), color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  transition: transform 0.35s var(--ease), background 0.35s var(--ease), color 0.35s var(--ease), box-shadow 0.35s var(--ease), border-color 0.35s var(--ease);
 }
+.btn-icon { flex-shrink: 0; }
 .btn-primary { background: var(--gold-fill); color: var(--ink); box-shadow: 0 8px 30px -8px rgba(212,175,55,0.5); }
 .btn-primary:hover { box-shadow: 0 14px 36px -6px rgba(212,175,55,0.65); }
 .btn-secondary { border: 1px solid rgba(33,28,21,0.3); color: var(--ink); }
@@ -253,6 +258,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .btn-outline:hover { background: var(--gold-fill); color: var(--ink); }
 /* Baseline hover/press feedback; JS adds a magnetic follow on top for fine pointers. */
 .btn:active { transform: scale(0.96); }
+
+/* Brand-tinted glow so the "direct action" buttons (booking / social) stand out */
+.btn-whatsapp:hover { box-shadow: 0 12px 32px -8px rgba(37,211,102,0.5); border-color: #25D366; }
+.btn-whatsapp.btn-primary { box-shadow: 0 8px 26px -8px rgba(37,211,102,0.4); }
+.btn-whatsapp.btn-primary:hover { box-shadow: 0 14px 34px -6px rgba(37,211,102,0.55); }
+.btn-instagram:hover { box-shadow: 0 12px 32px -8px rgba(193,53,132,0.45); border-color: #C13584; background: linear-gradient(135deg, #F58529, #DD2A7B, #8134AF); color: #fff; }
 @media (hover: hover) and (pointer: fine) {
   .btn:hover { transform: scale(1.03); }
 }
@@ -287,6 +298,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 .section-label.center { display: block; text-align: center; }
 .text-flourish { width: 130px; height: 22px; display: block; margin-bottom: 14px; }
+.text-flourish-end { margin: 10px 0 0; }
+.heading-heart { width: 0.62em; height: auto; vertical-align: middle; margin-left: 0.15em; position: relative; top: -0.05em; }
 .section-heading {
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   margin-bottom: 24px;
@@ -693,6 +706,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .footer-links h4, .footer-social h4 { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
 .footer-links li, .footer-social li { margin-bottom: 10px; font-size: 0.9rem; }
 .footer-links a:hover, .footer-social a:hover { color: var(--gold); }
+.footer-social-link { display: inline-flex; align-items: center; gap: 8px; }
 .footer-copy { text-align: center; color: var(--gray-dim); font-size: 0.78rem; border-top: 1px solid var(--border); padding-top: 24px; }
 
 /* ============ WhatsApp float / back to top ============ */

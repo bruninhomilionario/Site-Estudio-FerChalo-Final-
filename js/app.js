@@ -173,6 +173,16 @@
     });
   }
 
+  /* ---------- Hero background video ---------- */
+  (function initHeroVideo() {
+    var heroVideo = document.getElementById("hero-video");
+    if (!heroVideo) return;
+    if (reduceMotion) {
+      heroVideo.pause();
+      heroVideo.removeAttribute("autoplay");
+    }
+  })();
+
   /* ---------- Hero entrance sequence ---------- */
   (function initHeroEntrance() {
     var heroWords = document.querySelectorAll(".hero-heading span");

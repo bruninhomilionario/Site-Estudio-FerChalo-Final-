@@ -43,9 +43,11 @@
   --container: 1240px;
 }
 
-/* Light-section override — warm editorial ivory panels */
+/* Light-section override — warm editorial ivory panels.
+   --bg is translucent (not opaque) so the fixed starry background on
+   <body> shows softly through every section, per site-wide cosmic-bg request. */
 #sobre, #avaliacoes, #contato {
-  --bg: var(--warm-ivory);
+  --bg: rgba(243, 238, 229, 0.92);
   --bg-secondary: var(--sand-beige);
   --bg-card: #FFFFFF;
   --ink: var(--soft-black);
@@ -60,18 +62,19 @@
 /* These two read as plain white with warm-ivory — deepen to the more visibly
    warm sand-beige tone so they clearly stay in the site's palette. */
 #avaliacoes, #contato {
-  --bg: var(--sand-beige);
+  --bg: rgba(228, 216, 200, 0.92);
 }
 
-/* Dark-section variants (services deeper charcoal, portfolio near-black cinematic) */
-#servicos { --bg: var(--charcoal); }
-#portfolio { --bg: #09090A; --border: #28252A; }
+/* Dark-section variants (services deeper charcoal, portfolio near-black cinematic).
+   Also translucent so the cosmic background reads through. */
+#servicos { --bg: rgba(24, 23, 27, 0.85); }
+#portfolio { --bg: rgba(9, 9, 10, 0.85); --border: #28252A; }
 #estudio {
   --bg: radial-gradient(ellipse 60% 70% at 85% 30%, rgba(122,36,53,0.22), transparent 65%),
         radial-gradient(ellipse 50% 60% at 10% 90%, rgba(122,36,53,0.14), transparent 60%),
-        var(--obsidian);
+        rgba(13, 13, 15, 0.85);
 }
-.site-footer { --bg: #09090A; --border: var(--dark-border); --gray: var(--warm-gray); }
+.site-footer { --bg: rgba(9, 9, 10, 0.9); --border: var(--dark-border); --gray: var(--warm-gray); }
 
 /* .section elements are width-constrained (max-width + centered), so their own
    background only paints the center column. Give each themed section a
@@ -102,7 +105,12 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background-color: var(--obsidian);
+  background-image: url('../assets/img/cosmic-bg.webp');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-body);
   font-weight: 300;

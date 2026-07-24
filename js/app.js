@@ -177,10 +177,7 @@
   (function initHeroVideo() {
     var heroVideo = document.getElementById("hero-video");
     if (!heroVideo) return;
-    if (reduceMotion) {
-      heroVideo.pause();
-      heroVideo.removeAttribute("autoplay");
-    }
+    heroVideo.play().catch(function () {});
   })();
 
   /* ---------- Hero entrance sequence ---------- */

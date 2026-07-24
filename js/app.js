@@ -180,6 +180,25 @@
     heroVideo.play().catch(function () {});
   })();
 
+  /* ---------- Logo "letreiro" letter-drop ---------- */
+  (function initLogoLetters() {
+    var letters = document.querySelectorAll(".logo-letters span");
+    if (!letters.length) return;
+    if (reduceMotion) return;
+
+    gsap.set(letters, { opacity: 0, y: -34, rotation: function () { return gsap.utils.random(-12, 12); } });
+    gsap.to(letters, {
+      opacity: 1,
+      y: 0,
+      rotation: 0,
+      duration: 0.5,
+      ease: "bounce.out",
+      stagger: 0.045,
+      delay: 0.2,
+      onComplete: function () { gsap.set(letters, { clearProps: "transform" }); }
+    });
+  })();
+
   /* ---------- Hero entrance sequence ---------- */
   (function initHeroEntrance() {
     var heroWords = document.querySelectorAll(".hero-heading span");

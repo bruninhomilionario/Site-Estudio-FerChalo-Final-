@@ -244,20 +244,21 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   justify-content: space-between;
 }
 .nav-logo {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
+  display: inline-block;
+  line-height: 1;
 }
-.nav-logo span {
-  font-family: var(--font-body);
-  font-size: 0.6rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--antique-gold);
-  font-weight: 500;
+.logo-letters {
+  font-family: 'Bebas Neue', var(--font-display);
+  font-size: 1.7rem;
+  letter-spacing: 0.05em;
+  color: var(--warm-white);
+  text-shadow:
+    0 0 4px rgba(163, 52, 75, 0.85),
+    0 0 14px rgba(163, 52, 75, 0.65),
+    0 0 28px rgba(163, 52, 75, 0.45),
+    0 0 46px rgba(163, 52, 75, 0.3);
 }
+.logo-letters span { display: inline-block; }
 .nav-menu {
   display: flex;
   align-items: center;
@@ -742,12 +743,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 /* ============ CTA banner ============ */
 .cta-banner {
   text-align: center;
-  background: linear-gradient(135deg, #111013 0%, #30131B 100%);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--dark-border);
   padding: 100px 6vw;
   color: var(--warm-white);
-  box-shadow: 0 20px 50px -24px rgba(0,0,0,0.5);
 }
 .cta-ribbon { width: 200px; height: 40px; margin: 0 auto 24px; display: block; }
 .cta-heading { font-size: clamp(2rem, 4.4vw, 3.4rem); margin-bottom: 20px; color: var(--warm-white); }

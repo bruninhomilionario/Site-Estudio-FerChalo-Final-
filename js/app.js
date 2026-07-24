@@ -180,6 +180,22 @@
     heroVideo.play().catch(function () {});
   })();
 
+  /* ---------- Studio video: play/loop while scrolled into view ---------- */
+  (function initStudioVideo() {
+    var studioVideo = document.getElementById("studio-video");
+    if (!studioVideo) return;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          studioVideo.play().catch(function () {});
+        } else {
+          studioVideo.pause();
+        }
+      });
+    }, { threshold: 0.4 });
+    observer.observe(studioVideo);
+  })();
+
   /* ---------- Logo "letreiro" letter-drop ---------- */
   (function initLogoLetters() {
     var letters = document.querySelectorAll(".logo-letters span");
@@ -204,37 +220,34 @@
     var heroWords = document.querySelectorAll(".hero-heading span");
     var heroTargets = {
       decor: document.querySelector(".hero-decor"),
-      label: document.querySelector("#hero .section-label"),
       tagline: document.querySelector(".hero-tagline"),
       badges: document.querySelectorAll(".trust-badges li"),
       ctas: document.querySelectorAll(".hero-ctas .btn")
     };
-    var whatsapp = document.getElementById("whatsapp-float");
+    var socialFloats = [document.getElementById("instagram-float"), document.getElementById("whatsapp-float")].filter(Boolean);
 
     if (reduceMotion) {
-      if (whatsapp) gsap.set(whatsapp, { opacity: 1, clearProps: "transform" });
+      if (socialFloats.length) gsap.set(socialFloats, { opacity: 1, clearProps: "transform" });
       return;
     }
 
     gsap.set(heroTargets.decor, { opacity: 0, scale: 0.92 });
-    gsap.set(heroTargets.label, { opacity: 0, y: -22 });
     gsap.set(heroWords, { opacity: 0, y: -60 * distScale, rotation: -3 });
     gsap.set(heroTargets.tagline, { opacity: 0, y: -26 * distScale });
     gsap.set(heroTargets.badges, { opacity: 0, y: -14 });
     gsap.set(heroTargets.ctas, { opacity: 0, y: -18 });
-    if (whatsapp) gsap.set(whatsapp, { opacity: 0, scale: 0.6, y: 20 });
+    if (socialFloats.length) gsap.set(socialFloats, { opacity: 0, scale: 0.6, y: 20 });
 
     var tl = gsap.timeline({ delay: 0.15 });
     tl.to(heroTargets.decor, { opacity: 1, scale: 1, duration: 1.1 * durScale, ease: "power2.out" }, 0)
-      .to(heroTargets.label, { opacity: 1, y: 0, duration: 0.6 * durScale, ease: "power2.out" }, 0.15)
       .to(heroWords, { opacity: 1, y: 0, rotation: 0, duration: 0.8 * durScale, ease: "back.out(1.3)", stagger: 0.07 }, 0.3)
       .to(heroTargets.tagline, { opacity: 1, y: 0, duration: 0.7 * durScale, ease: "power2.out" }, "-=0.35")
       .to(heroTargets.badges, { opacity: 1, y: 0, duration: 0.5 * durScale, ease: "power2.out", stagger: 0.06 }, "-=0.3")
       .to(heroTargets.ctas, { opacity: 1, y: 0, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }, "-=0.35")
       .eventCallback("onComplete", function () {
-        gsap.set([heroTargets.decor, heroTargets.label, heroWords, heroTargets.tagline, heroTargets.badges, heroTargets.ctas], { clearProps: "transform,opacity" });
-        if (whatsapp) {
-          gsap.to(whatsapp, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.4)", onComplete: clearAfter(whatsapp) });
+        gsap.set([heroTargets.decor, heroWords, heroTargets.tagline, heroTargets.badges, heroTargets.ctas], { clearProps: "transform,opacity" });
+        if (socialFloats.length) {
+          gsap.to(socialFloats, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.4)", stagger: 0.08, onComplete: clearAfter(socialFloats) });
         }
       });
   })();

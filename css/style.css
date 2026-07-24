@@ -572,7 +572,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   box-shadow: 0 14px 34px -20px rgba(0,0,0,0.45);
   transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), border-color 0.4s var(--ease);
 }
-.service-card:hover { transform: translateY(-6px); border-color: var(--deep-burgundy); box-shadow: 0 20px 40px -18px rgba(0,0,0,0.55); }
+@media (hover: hover) and (pointer: fine) {
+  .service-card:hover { transform: translateY(-6px); border-color: var(--deep-burgundy); box-shadow: 0 20px 40px -18px rgba(0,0,0,0.55); }
+}
 .service-media { aspect-ratio: 4/3; overflow: hidden; }
 .service-media-track { display: flex; height: 100%; width: max-content; }
 .service-media-track img { height: 100%; width: auto; flex-shrink: 0; object-fit: cover; }
@@ -638,8 +640,12 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   opacity: 0;
   transition: opacity 0.4s var(--ease);
 }
-.portfolio-item:hover::after { opacity: 1; }
-.portfolio-item:hover img { transform: scale(1.08); }
+/* Hover zoom/overlay only for real mouse pointers — on touch devices this
+   fired on tap and visually fought the finger during scroll. */
+@media (hover: hover) and (pointer: fine) {
+  .portfolio-item:hover::after { opacity: 1; }
+  .portfolio-item:hover img { transform: scale(1.08); }
+}
 .portfolio-item.is-hidden { display: none; }
 .portfolio-empty { text-align: center; color: var(--gray); margin-top: 20px; }
 

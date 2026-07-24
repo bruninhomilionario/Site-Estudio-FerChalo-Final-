@@ -227,14 +227,6 @@
   <section id="portfolio" class="section" data-fade>
     <span class="section-label center">Portfólio</span>
     <h2 class="section-heading center">Alguns Trabalhos Feito Por Mim ❤️</h2>
-    <div class="portfolio-filters" role="tablist" aria-label="Filtrar portfólio">
-      <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true" aria-label="Todos"></button>
-      <button class="filter-btn" data-filter="tatuagens" role="tab" aria-selected="false" aria-label="Tatuagens"></button>
-      <button class="filter-btn" data-filter="fine-line" role="tab" aria-selected="false" aria-label="Fine Line"></button>
-      <button class="filter-btn" data-filter="blackwork" role="tab" aria-selected="false" aria-label="Blackwork"></button>
-      <button class="filter-btn" data-filter="minimalista" role="tab" aria-selected="false" aria-label="Minimalista"></button>
-      <button class="filter-btn" data-filter="personalizado" role="tab" aria-selected="false" aria-label="Personalizado"></button>
-    </div>
     <div class="masonry-grid" id="portfolio-grid">
       <button class="portfolio-item" data-category="tatuagens blackwork personalizado" aria-label="Ampliar imagem: tatuagem blackwork de astronauta">
         <img src="assets/portfolio/portfolio-01-blackwork-astronaut.webp" width="733" height="852" alt="Tatuagem blackwork de astronauta no antebraço" loading="lazy">
@@ -248,17 +240,11 @@
       <button class="portfolio-item" data-category="tatuagens fine-line blackwork" aria-label="Ampliar imagem: tatuagem de peônias no ombro">
         <img src="assets/portfolio/portfolio-04-blackwork-peony-shoulder.webp" width="560" height="752" alt="Tatuagem de peônias em blackwork no ombro" loading="lazy">
       </button>
-      <button class="portfolio-item" data-category="tatuagens personalizado" aria-label="Ampliar imagem: tatuagem de lettering">
-        <img src="assets/portfolio/portfolio-05-lettering-salmo.webp" width="668" height="731" alt="Tatuagem de lettering com versículo no antebraço" loading="lazy">
-      </button>
       <button class="portfolio-item" data-category="tatuagens blackwork personalizado" aria-label="Ampliar imagem: tatuagem estilo anime">
         <img src="assets/portfolio/portfolio-06-custom-dbz-realism.webp" width="559" height="799" alt="Tatuagem estilo anime em preto e cinza no antebraço" loading="lazy">
       </button>
       <button class="portfolio-item" data-category="tatuagens fine-line blackwork personalizado" aria-label="Ampliar imagem: tatuagem floral com lettering nas costas">
         <img src="assets/portfolio/portfolio-10-blackwork-floral-lettering-costas.webp" width="518" height="805" alt="Tatuagem floral com lettering vertical nas costas" loading="lazy">
-      </button>
-      <button class="portfolio-item" data-category="tatuagens personalizado" aria-label="Ampliar imagem: tatuagem colorida de unicórnio no peito">
-        <img src="assets/portfolio/portfolio-11-color-unicornio-peito.webp" width="605" height="805" alt="Tatuagem colorida estilo aquarela de unicórnio no peito" loading="lazy">
       </button>
       <button class="portfolio-item" data-category="tatuagens fine-line blackwork" aria-label="Ampliar imagem: tatuagem floral mandala na perna">
         <img src="assets/portfolio/portfolio-12-blackwork-floral-perna.webp" width="561" height="850" alt="Tatuagem floral com mandala em blackwork na perna" loading="lazy">
@@ -275,9 +261,6 @@
       <button class="portfolio-item" data-category="tatuagens blackwork fine-line personalizado" aria-label="Ampliar imagem: tatuagem de leão com flores na coxa">
         <img src="assets/portfolio/portfolio-16-blackwork-leao-floral-coxa.webp" width="784" height="845" alt="Tatuagem de leão com flores em blackwork na coxa" loading="lazy">
       </button>
-      <button class="portfolio-item" data-category="tatuagens blackwork fine-line personalizado" aria-label="Ampliar imagem: tatuagem de onça no antebraço">
-        <img src="assets/portfolio/portfolio-17-blackwork-onca-antebraco.webp" width="640" height="766" alt="Tatuagem de onça em blackwork no antebraço" loading="lazy">
-      </button>
       <button class="portfolio-item" data-category="tatuagens blackwork fine-line" aria-label="Ampliar imagem: tatuagem de cobra com rosas no antebraço">
         <img src="assets/portfolio/portfolio-18-blackwork-cobra-rosas-antebraco.webp" width="650" height="776" alt="Tatuagem de cobra com rosas em blackwork no antebraço" loading="lazy">
       </button>
@@ -286,9 +269,6 @@
       </button>
       <button class="portfolio-item" data-category="tatuagens minimalista fine-line" aria-label="Ampliar imagem: tatuagem minimalista de ramo no ombro">
         <img src="assets/portfolio/portfolio-20-minimalista-ramo-ombro.webp" width="712" height="601" alt="Tatuagem minimalista de ramo fine line no ombro" loading="lazy">
-      </button>
-      <button class="portfolio-item" data-category="tatuagens blackwork fine-line" aria-label="Ampliar imagem: tatuagem de cobra com peônias no braço">
-        <img src="assets/portfolio/portfolio-21-blackwork-cobra-peonias-braco.webp" width="580" height="701" alt="Tatuagem de cobra com peônias em blackwork no braço" loading="lazy">
       </button>
       <button class="portfolio-item" data-category="tatuagens blackwork personalizado" aria-label="Ampliar imagem: tatuagem de árvore da vida no antebraço">
         <img src="assets/portfolio/portfolio-22-blackwork-arvore-vida-antebraco.webp" width="433" height="743" alt="Tatuagem de árvore da vida com símbolos em blackwork no antebraço" loading="lazy">
@@ -526,6 +506,11 @@
   </div>
   <p class="footer-copy">© <span id="year"></span> Fran Chaló Tatuagem &amp; Piercing. Todos os direitos reservados.</p>
 </footer>
+
+<!-- Floating Facebook -->
+<a href="https://www.facebook.com/share/1LrrJWvLZm/?mibextid=wwXIfr" id="facebook-float" target="_blank" rel="noopener" aria-label="Seguir no Facebook">
+  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="#F7F3ED" d="M15.12 8.5H13V6.99c0-.71.47-.88.8-.88h1.28V4.01L13.02 4c-2.36 0-2.9 1.77-2.9 2.9V8.5H8.5v2.5h1.62V20h2.88v-9h1.94l.18-2.5z"/></svg>
+</a>
 
 <!-- Floating Instagram -->
 <a href="https://www.instagram.com/franchalotattoo/" id="instagram-float" target="_blank" rel="noopener" aria-label="Seguir no Instagram">

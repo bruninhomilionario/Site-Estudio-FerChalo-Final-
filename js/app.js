@@ -206,8 +206,11 @@
   }
 
   if (!reduceMotion) {
+    // .greview-text is intentionally excluded: those cards get cloned by the
+    // infinite marquee below, and cloning would bake in whatever mid-reveal
+    // opacity the words had at that moment, leaving half the loop stuck dim.
     var revealEls = document.querySelectorAll(
-      "#sobre .section-heading, #sobre .section-body, #servicos .section-heading, #portfolio .section-heading, #avaliacoes .section-heading, .greview-text, #estudio .section-heading, #estudio .section-body, #estudio .check-list li, .cta-heading, .cta-text, #contato .section-heading"
+      "#sobre .section-heading, #sobre .section-body, #servicos .section-heading, #portfolio .section-heading, #avaliacoes .section-heading, #estudio .section-heading, #estudio .section-body, #estudio .check-list li, .cta-heading, .cta-text, #contato .section-heading"
     );
     revealEls.forEach(function (el) {
       var words = prepareRevealWords(el);
@@ -219,12 +222,13 @@
         stagger: 0.06,
         scrollTrigger: {
           trigger: el,
-          start: "top 90%",
-          end: "top 42%",
+          start: "top 98%",
+          end: "top 15%",
           scrub: 0.4
         }
       });
     });
+    ScrollTrigger.refresh();
   }
 
   /* ---------- Hero background video ---------- */
@@ -278,7 +282,7 @@
       badges: document.querySelectorAll(".trust-badges li"),
       ctas: document.querySelectorAll(".hero-ctas .btn")
     };
-    var socialFloats = [document.getElementById("instagram-float"), document.getElementById("whatsapp-float")].filter(Boolean);
+    var socialFloats = [document.getElementById("facebook-float"), document.getElementById("instagram-float"), document.getElementById("whatsapp-float")].filter(Boolean);
 
     if (reduceMotion) {
       if (socialFloats.length) gsap.set(socialFloats, { opacity: 1, clearProps: "transform" });

@@ -43,38 +43,20 @@
   --container: 1240px;
 }
 
-/* Light-section override — warm editorial ivory panels.
-   --bg is translucent (not opaque) so the fixed starry background on
-   <body> shows softly through every section, per site-wide cosmic-bg request. */
-#sobre, #avaliacoes, #contato {
-  --bg: rgba(243, 238, 229, 0.92);
-  --bg-secondary: var(--sand-beige);
-  --bg-card: #FFFFFF;
-  --ink: var(--soft-black);
-  --gray: #514B47;
-  --gray-dim: #8A827C;
-  --border: rgba(25, 23, 26, 0.12);
-  /* Antique gold reads too pale on this light ivory for small text (labels,
-     captions) — swap to burgundy there. Stars/icons keep literal --gold. */
-  --gold-text: var(--deep-burgundy);
-  color: var(--ink);
-}
-/* These two read as plain white with warm-ivory — deepen to the more visibly
-   warm sand-beige tone so they clearly stay in the site's palette. */
-#avaliacoes, #contato {
-  --bg: rgba(228, 216, 200, 0.92);
-}
-
-/* Dark-section variants (services deeper charcoal, portfolio near-black cinematic).
-   Also translucent so the cosmic background reads through. */
-#servicos { --bg: rgba(24, 23, 27, 0.85); }
-#portfolio { --bg: rgba(9, 9, 10, 0.85); --border: #28252A; }
+/* All sections now share the same dark theme (light ivory/sand panels
+   removed per request) — --bg stays translucent so the fixed cosmic
+   background on <body> reads through everywhere. */
+#sobre { --bg: rgba(13, 13, 15, 0.78); }
+#servicos { --bg: rgba(24, 23, 27, 0.78); }
+#portfolio { --bg: rgba(9, 9, 10, 0.78); --border: #28252A; }
+#avaliacoes { --bg: rgba(24, 23, 27, 0.78); }
 #estudio {
   --bg: radial-gradient(ellipse 60% 70% at 85% 30%, rgba(122,36,53,0.22), transparent 65%),
         radial-gradient(ellipse 50% 60% at 10% 90%, rgba(122,36,53,0.14), transparent 60%),
-        rgba(13, 13, 15, 0.85);
+        rgba(13, 13, 15, 0.78);
 }
-.site-footer { --bg: rgba(9, 9, 10, 0.9); --border: var(--dark-border); --gray: var(--warm-gray); }
+#contato { --bg: rgba(9, 9, 10, 0.78); }
+.site-footer { --bg: rgba(9, 9, 10, 0.82); --border: var(--dark-border); --gray: var(--warm-gray); }
 
 /* .section elements are width-constrained (max-width + centered), so their own
    background only paints the center column. Give each themed section a
@@ -106,11 +88,6 @@ html {
 
 body {
   background-color: var(--obsidian);
-  background-image: url('../assets/img/cosmic-bg.webp');
-  background-size: cover;
-  background-position: center center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-body);
   font-weight: 300;
@@ -119,6 +96,21 @@ body {
   overscroll-behavior-x: none;
   max-width: 100%;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Site-wide cosmic background. `background-attachment: fixed` on <body> is
+   unreliable on mobile (iOS Safari in particular ignores/breaks it), so the
+   image lives on a genuinely `position: fixed` pseudo-element instead —
+   that works identically on desktop and mobile. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background-image: url('../assets/img/cosmic-bg.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 img { max-width: 100%; display: block; }
@@ -364,10 +356,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   animation: ripple-anim 0.65s ease-out;
   pointer-events: none;
 }
-/* On the light-ivory sections, buttons sit on a pale backdrop — use a dark ripple there instead. */
-#sobre .ripple-circle, #avaliacoes .ripple-circle, #contato .ripple-circle {
-  background: rgba(25,23,26,0.22);
-}
 @keyframes ripple-anim {
   to { transform: scale(2.6); opacity: 0; }
 }
@@ -502,7 +490,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .portrait-placeholder {
   aspect-ratio: 4/5;
   border-radius: var(--radius-md);
-  background: linear-gradient(160deg, #ECE3D0 0%, #E0D4B8 100%);
+  background: linear-gradient(160deg, #2A2730 0%, #18171B 100%);
   display: flex;
   align-items: center;
   justify-content: center;

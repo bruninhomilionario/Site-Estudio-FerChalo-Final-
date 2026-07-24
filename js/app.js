@@ -138,8 +138,7 @@
     document.querySelectorAll("[data-fade], .cta-banner").forEach(function (section) {
       var groups = [
         { els: section.querySelectorAll(".section-label"), from: { y: -22 * distScale }, duration: 0.6, ease: "power2.out" },
-        { els: section.querySelectorAll(".section-heading, .cta-heading"), from: { y: -56 * distScale, rotation: -2 }, duration: 1 * durScale, ease: "back.out(1.25)" },
-        { els: section.querySelectorAll(".section-body, .cta-text, .check-list, .tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
+        { els: section.querySelectorAll(".tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
         { els: section.querySelectorAll(".portfolio-filters"), from: { y: -20 * distScale }, duration: 0.6 * durScale, ease: "power2.out" },
         { els: section.querySelectorAll(".split-media, .service-media, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
         { els: section.querySelectorAll(".service-card, .contact-info, .google-rating-bar"), from: { y: -46 * distScale, scale: 0.95 }, duration: 0.9 * durScale, ease: "back.out(1.25)", stagger: 0.12 },
@@ -168,6 +167,61 @@
             if (g.from.filter) toVars.filter = "blur(0px)";
             tl.to(g.els, toVars, idx === 0 ? 0 : "-=" + Math.min(g.duration * 0.5, 0.4));
           });
+        }
+      });
+    });
+  }
+
+  /* ---------- Scroll "correnteza" text reveal ----------
+     Splits headings/paragraphs into per-word spans and ties their opacity
+     directly to scroll position (scrub) so the text lights up progressively
+     as the page scrolls, instead of playing once on entry. Applies site-wide
+     to every section except the Hero, which keeps its own load-in sequence. */
+  function prepareRevealWords(el) {
+    var frag = document.createDocumentFragment();
+    var targets = [];
+    Array.prototype.forEach.call(el.childNodes, function (node) {
+      if (node.nodeType === 3) {
+        node.textContent.split(/(\s+)/).forEach(function (part) {
+          if (part === "") return;
+          if (/^\s+$/.test(part)) {
+            frag.appendChild(document.createTextNode(part));
+            return;
+          }
+          var span = document.createElement("span");
+          span.className = "reveal-word";
+          span.textContent = part;
+          frag.appendChild(span);
+          targets.push(span);
+        });
+      } else {
+        var clone = node.cloneNode(true);
+        frag.appendChild(clone);
+        if (node.nodeType === 1 && node.tagName !== "BR") targets.push(clone);
+      }
+    });
+    el.innerHTML = "";
+    el.appendChild(frag);
+    return targets;
+  }
+
+  if (!reduceMotion) {
+    var revealEls = document.querySelectorAll(
+      "#sobre .section-heading, #sobre .section-body, #servicos .section-heading, #portfolio .section-heading, #avaliacoes .section-heading, .greview-text, #estudio .section-heading, #estudio .section-body, #estudio .check-list li, .cta-heading, .cta-text, #contato .section-heading"
+    );
+    revealEls.forEach(function (el) {
+      var words = prepareRevealWords(el);
+      if (!words.length) return;
+      gsap.set(words, { opacity: 0.12 });
+      gsap.to(words, {
+        opacity: 1,
+        ease: "none",
+        stagger: 0.06,
+        scrollTrigger: {
+          trigger: el,
+          start: "top 90%",
+          end: "top 42%",
+          scrub: 0.4
         }
       });
     });

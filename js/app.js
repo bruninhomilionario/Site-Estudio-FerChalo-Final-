@@ -230,6 +230,33 @@
     });
   }
 
+  /* ---------- Hero heading scroll "waterfall" reveal ----------
+     The Hero headline lights up word-by-word as the visitor scrolls, instead
+     of playing once on load like the rest of the Hero. Progress is tied to
+     scroll distance through the Hero section itself (not the heading's own
+     position), so the words start dim right at the top of the page and
+     finish lighting up partway through the first scroll past the Hero. */
+  if (!reduceMotion) {
+    var heroHeadingEl = document.querySelector("[data-scroll-reveal]");
+    if (heroHeadingEl) {
+      var heroWords = prepareRevealWords(heroHeadingEl);
+      if (heroWords.length) {
+        gsap.set(heroWords, { opacity: 0.1 });
+        gsap.to(heroWords, {
+          opacity: 1,
+          ease: "none",
+          stagger: 0.08,
+          scrollTrigger: {
+            trigger: "#hero",
+            start: "top top",
+            end: "60% top",
+            scrub: 0.4
+          }
+        });
+      }
+    }
+  }
+
   /* ---------- Scroll "converge" heading effect ----------
      Splits each big section heading into per-character spans. Every
      character starts offset sideways and rotated in 3D based on its
@@ -326,11 +353,12 @@
     });
   })();
 
-  /* ---------- Hero entrance sequence ---------- */
+  /* ---------- Hero entrance sequence ----------
+     The heading itself is no longer part of this one-shot load-in — it gets
+     its own scroll-synced "waterfall" word reveal instead (see below). */
   (function initHeroEntrance() {
-    var heroWords = document.querySelectorAll(".hero-heading span");
     var heroTargets = {
-      decor: document.querySelector(".hero-decor"),
+      subheading: document.querySelector(".hero-subheading"),
       tagline: document.querySelector(".hero-tagline"),
       badges: document.querySelectorAll(".trust-badges li"),
       ctas: document.querySelectorAll(".hero-ctas .btn")
@@ -340,21 +368,19 @@
     // Always plays, even with reduce-motion enabled at the OS level — this is
     // a one-shot entrance flourish (not a scroll-jacked/looping effect), and
     // OS-level "reduce animations" toggles have silently swallowed it before.
-    gsap.set(heroTargets.decor, { opacity: 0, scale: 0.92 });
-    gsap.set(heroWords, { opacity: 0, y: -60 * distScale, rotation: -3 });
+    gsap.set(heroTargets.subheading, { opacity: 0, y: -20 * distScale });
     gsap.set(heroTargets.tagline, { opacity: 0, y: -26 * distScale });
     gsap.set(heroTargets.badges, { opacity: 0, y: -14 });
     gsap.set(heroTargets.ctas, { opacity: 0, y: -18 });
     if (socialFloats.length) gsap.set(socialFloats, { opacity: 0, scale: 0.6, y: 20 });
 
     var tl = gsap.timeline({ delay: 0.15 });
-    tl.to(heroTargets.decor, { opacity: 1, scale: 1, duration: 1.1 * durScale, ease: "power2.out" }, 0)
-      .to(heroWords, { opacity: 1, y: 0, rotation: 0, duration: 0.8 * durScale, ease: "back.out(1.3)", stagger: 0.07 }, 0.3)
-      .to(heroTargets.tagline, { opacity: 1, y: 0, duration: 0.7 * durScale, ease: "power2.out" }, "-=0.35")
+    tl.to(heroTargets.subheading, { opacity: 1, y: 0, duration: 0.7 * durScale, ease: "power2.out" }, 0.3)
+      .to(heroTargets.tagline, { opacity: 1, y: 0, duration: 0.7 * durScale, ease: "power2.out" }, "-=0.4")
       .to(heroTargets.badges, { opacity: 1, y: 0, duration: 0.5 * durScale, ease: "power2.out", stagger: 0.06 }, "-=0.3")
       .to(heroTargets.ctas, { opacity: 1, y: 0, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }, "-=0.35")
       .eventCallback("onComplete", function () {
-        gsap.set([heroTargets.decor, heroWords, heroTargets.tagline, heroTargets.badges, heroTargets.ctas], { clearProps: "transform,opacity" });
+        gsap.set([heroTargets.subheading, heroTargets.tagline, heroTargets.badges, heroTargets.ctas], { clearProps: "transform,opacity" });
         if (socialFloats.length) {
           gsap.to(socialFloats, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.4)", stagger: 0.08, onComplete: clearAfter(socialFloats) });
         }
@@ -364,14 +390,6 @@
   /* ---------- Subtle scroll parallax (selected decorative/foreground elements) ---------- */
   if (!reduceMotion) {
     var parallaxAmt = isMobile ? 18 : 45;
-    var heroDecorEl = document.querySelector(".hero-decor");
-    if (heroDecorEl) {
-      gsap.to(heroDecorEl, {
-        y: parallaxAmt,
-        ease: "none",
-        scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true }
-      });
-    }
     var portraitImg = document.querySelector(".portrait-placeholder img");
     if (portraitImg) {
       gsap.to(portraitImg, {

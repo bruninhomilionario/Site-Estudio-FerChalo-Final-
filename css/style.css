@@ -419,15 +419,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   overflow: hidden;
   padding: 0 8vw;
 }
-.hero-decor {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: min(900px, 140vw);
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
-  pointer-events: none;
-}
-.hero-linework { width: 100%; height: auto; }
 .hero-gradient {
   position: absolute;
   inset: 0;
@@ -444,6 +435,16 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 .hero-heading span { display: inline-block; }
 .hero-heading .accent { color: var(--ruby-burgundy); font-style: italic; }
+.hero-heading .reveal-word { display: inline-block; }
+.hero-subheading {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--gold-text);
+  font-size: clamp(1.05rem, 1.9vw, 1.4rem);
+  letter-spacing: 0.01em;
+  max-width: 620px;
+  margin: 0 0 16px;
+}
 .hero-tagline {
   color: var(--gray);
   font-size: clamp(1rem, 1.6vw, 1.25rem);

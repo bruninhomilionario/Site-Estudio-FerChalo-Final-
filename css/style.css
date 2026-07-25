@@ -430,12 +430,14 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   font-family: var(--font-signage);
   font-size: clamp(2.6rem, 7vw, 6.2rem);
   letter-spacing: 0.01em;
+  /* Shifted down into the vertical spot the red subheading used to occupy,
+     now that the subheading moved down to caption the Services carousel. */
+  margin-top: 36px;
   margin-bottom: 28px;
   color: var(--warm-white);
 }
 .hero-heading span { display: inline-block; }
 .hero-heading .accent { color: var(--ruby-burgundy); font-style: italic; }
-.hero-heading .reveal-word { display: inline-block; }
 .hero-subheading {
   font-family: var(--font-body);
   font-weight: 600;
@@ -445,11 +447,28 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   max-width: 620px;
   margin: 0 0 16px;
 }
+.hero-subheading.coverflow-caption {
+  max-width: none;
+  width: 100%;
+  text-align: center;
+  margin: 0 0 18px;
+}
+.subheading-highlight {
+  color: var(--ruby-burgundy);
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: rgba(163,52,75,0.5);
+  text-underline-offset: 4px;
+}
 .hero-tagline {
+  font-family: var(--font-signage);
   color: var(--gray);
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
+  letter-spacing: 0.02em;
   max-width: 620px;
-  margin: 0 0 44px;
+  width: 100%;
+  text-align: center;
+  margin: 90px auto 44px;
 }
 .hero-ctas { display: flex; gap: 18px; justify-content: flex-start; flex-wrap: wrap; margin-bottom: 52px; }
 .trust-badges {
@@ -617,7 +636,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .services-grid {
   display: flex;
   justify-content: center;
-  margin-top: 56px;
+  width: 100%;
+  margin-bottom: 36px;
 }
 /* No card box here on purpose — photos float directly on the section
    background, each with its own shadow (see .coverflow-slide), no
@@ -1116,9 +1136,21 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
     transform: translateX(100%);
     transition: transform 0.45s var(--ease);
     border-left: 1px solid var(--dark-border);
+    overflow: hidden;
+    /* Tattoo-flash style line art (same ornamental language as the rest of
+       the site — flourishes, circles, sparkle diamonds) decorating the
+       mobile menu panel instead of leaving it plain. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 420'%3E%3Cg fill='none' stroke='%23A3344B' stroke-width='1.4'%3E%3Cpath d='M150 50 C 100 110,100 190,150 250 C 200 310,200 370,150 420' opacity='0.32'/%3E%3Cpath d='M150 50 C 113 92,118 148,150 175' opacity='0.32'/%3E%3Ccircle cx='150' cy='230' r='95' opacity='0.22'/%3E%3Ccircle cx='150' cy='230' r='128' opacity='0.14'/%3E%3Cpath d='M55 130 l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5 Z' opacity='0.4'/%3E%3Cpath d='M235 320 l4 11 11 4 -11 4 -4 11 -4 -11 -11 -4 11 -4 Z' opacity='0.32'/%3E%3Cpath d='M240 90 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z' opacity='0.28'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: bottom -20px right -60px;
+    background-size: 280px auto;
   }
   .nav-menu.is-open { transform: translateX(0); }
   .nav-toggle { display: flex; }
+  /* This CTA duplicates the WhatsApp floating button and the Hero/CTA
+     buttons already reachable once the menu is open — dropped from the
+     mobile panel specifically (still shown in the desktop nav bar). */
+  .nav-menu .nav-cta { display: none; }
 
   .section-split, .section-split.reverse {
     grid-template-columns: 1fr;
@@ -1136,13 +1168,40 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   /* Phone Hero is very tall (100vh) vs. the nearly-square photo — "cover"
      was cropping off Fran's hands/tattoo machine. Use "contain" instead so
      the whole photo always stays visible with zero cropping; the empty
-     space below it is filled with the same dark tone as the rest of the
-     site and covered by the existing gradient/hero content. */
+     space below/around it shows the site's starry cosmic background
+     (body::before) instead of a flat color. */
   #hero::before {
     background-size: contain;
     background-position: top center;
-    background-color: var(--obsidian);
   }
+  /* Hero's height was rigidly locked to 100vh with overflow hidden — with
+     the new two-line heading + subheading + description + badges, content
+     no longer reliably fits a short phone viewport and was getting clipped
+     top/bottom. Let it grow with its content instead. */
+  .hero-standalone {
+    height: auto;
+    min-height: 100vh;
+    padding: 190px 6vw 60px;
+  }
+  .hero-heading { font-size: clamp(1.9rem, 8vw, 2.6rem); margin-bottom: 18px; }
+  .hero-subheading { margin-top: 30px; margin-bottom: 12px; }
+  .hero-tagline { margin-bottom: 30px; }
+  /* Fills the leftover empty space that used to sit below the badges
+     (Hero's height can exceed its content on tall phones) by stretching
+     hero-content to the full available height and pushing the button
+     (with the badges following right underneath it) down into it, instead
+     of leaving a blank gap before the next section. */
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 250px);
+  }
+  .hero-ctas { margin-top: auto; margin-bottom: 14px; }
+  .trust-badges { margin-top: 0; margin-bottom: 70px; }
+  /* Anchored to the section bottom via position:absolute — with Hero's
+     height now flexible instead of a fixed 100vh, this would float far
+     below the visible content instead of at the viewport edge. */
+  .scroll-indicator { display: none; }
   .section { padding: 90px 6vw; }
   .reviews-marquee { margin: 0 -6vw 20px; padding: 4px 6vw; }
   .masonry-grid { grid-template-columns: 1fr; }
@@ -1150,8 +1209,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
   .greview-card { flex-basis: 260px; }
   .google-rating-bar { justify-content: center; text-align: center; }
-  .hero-ctas { flex-direction: column; width: 100%; }
-  .hero-ctas .btn { width: 100%; }
+  .hero-ctas { flex-direction: column; align-items: center; width: 100%; }
+  .hero-ctas .btn { width: auto; padding: 15px 26px; }
   #back-to-top { right: 84px; width: 40px; height: 40px; }
   #whatsapp-float { width: 52px; height: 52px; bottom: 20px; right: 16px; }
   #instagram-float { width: 52px; height: 52px; bottom: 84px; right: 16px; }

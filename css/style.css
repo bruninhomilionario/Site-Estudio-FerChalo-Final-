@@ -50,7 +50,6 @@
    removed per request) — --bg stays translucent so the fixed cosmic
    background on <body> reads through everywhere. */
 #sobre { --bg: rgba(13, 13, 15, 0.78); }
-#servicos { --bg: rgba(24, 23, 27, 0.78); }
 #portfolio { --bg: rgba(9, 9, 10, 0.78); --border: #28252A; }
 #avaliacoes { --bg: rgba(24, 23, 27, 0.78); }
 #estudio {
@@ -64,11 +63,11 @@
 /* .section elements are width-constrained (max-width + centered), so their own
    background only paints the center column. Give each themed section a
    full-bleed backdrop via a positioned pseudo-element instead. */
-#sobre, #servicos, #portfolio, #avaliacoes, #estudio, #contato, .site-footer {
+#sobre, #portfolio, #avaliacoes, #estudio, #contato, .site-footer {
   position: relative;
   color: var(--ink);
 }
-#sobre::before, #servicos::before, #portfolio::before,
+#sobre::before, #portfolio::before,
 #avaliacoes::before, #estudio::before, #contato::before, .site-footer::before {
   content: '';
   position: absolute;
@@ -409,15 +408,18 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 /* ============ Hero ============ */
 .hero-standalone {
   position: relative;
-  height: 100vh;
-  min-height: 640px;
+  /* Was a rigid height:100vh + overflow:hidden — fine while the Hero only
+     held the heading/tagline, but with the Services carousel now living
+     here too, total content routinely exceeds one screen's height on
+     desktop windows and was getting clipped at the bottom. Let it grow. */
+  height: auto;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   text-align: left;
-  overflow: hidden;
-  padding: 0 8vw;
+  padding: 130px 8vw 70px;
 }
 .hero-gradient {
   position: absolute;
@@ -430,9 +432,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   font-family: var(--font-signage);
   font-size: clamp(2.6rem, 7vw, 6.2rem);
   letter-spacing: 0.01em;
-  /* Shifted down into the vertical spot the red subheading used to occupy,
-     now that the subheading moved down to caption the Services carousel. */
-  margin-top: 36px;
   margin-bottom: 28px;
   color: var(--warm-white);
 }
@@ -461,14 +460,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   text-underline-offset: 4px;
 }
 .hero-tagline {
-  font-family: var(--font-signage);
   color: var(--gray);
-  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
   max-width: 620px;
-  width: 100%;
-  text-align: center;
-  margin: 90px auto 44px;
+  margin: 0 0 44px;
 }
 .hero-ctas { display: flex; gap: 18px; justify-content: flex-start; flex-wrap: wrap; margin-bottom: 52px; }
 .trust-badges {
@@ -482,11 +477,15 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .trust-badges strong { color: var(--gold); margin-right: 6px; }
 
 .scroll-indicator {
+  /* Anchored to the section bottom via position:absolute — now that the
+     Services carousel lives in the Hero too, its height routinely exceeds
+     one screen, which would leave this hint floating far below the fold
+     instead of at the visible viewport edge. */
+  display: none;
   position: absolute;
   bottom: 34px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
@@ -1183,9 +1182,18 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
     min-height: 100vh;
     padding: 190px 6vw 60px;
   }
-  .hero-heading { font-size: clamp(1.9rem, 8vw, 2.6rem); margin-bottom: 18px; }
-  .hero-subheading { margin-top: 30px; margin-bottom: 12px; }
-  .hero-tagline { margin-bottom: 30px; }
+  /* Heading shifts down into the spot the red subheading used to occupy
+     there, and the description borrows the logo's blackletter font,
+     centered — both mobile-only refinements from testing on a phone. */
+  .hero-heading { font-size: clamp(1.9rem, 8vw, 2.6rem); margin-top: 60px; margin-bottom: 18px; }
+  .hero-tagline {
+    font-family: var(--font-signage);
+    letter-spacing: 0.02em;
+    font-size: clamp(1.05rem, 1.9vw, 1.35rem);
+    width: 100%;
+    text-align: center;
+    margin: 90px auto 30px;
+  }
   /* Fills the leftover empty space that used to sit below the badges
      (Hero's height can exceed its content on tall phones) by stretching
      hero-content to the full available height and pushing the button
@@ -1197,11 +1205,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
     min-height: calc(100vh - 250px);
   }
   .hero-ctas { margin-top: auto; margin-bottom: 14px; }
-  .trust-badges { margin-top: 0; margin-bottom: 70px; }
-  /* Anchored to the section bottom via position:absolute — with Hero's
-     height now flexible instead of a fixed 100vh, this would float far
-     below the visible content instead of at the viewport edge. */
-  .scroll-indicator { display: none; }
+  .trust-badges { margin-top: 0; margin-bottom: 180px; }
   .section { padding: 90px 6vw; }
   .reviews-marquee { margin: 0 -6vw 20px; padding: 4px 6vw; }
   .masonry-grid { grid-template-columns: 1fr; }

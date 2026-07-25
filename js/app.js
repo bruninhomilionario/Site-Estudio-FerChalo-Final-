@@ -139,10 +139,8 @@
       var groups = [
         { els: section.querySelectorAll(".section-label"), from: { y: -22 * distScale }, duration: 0.6, ease: "power2.out" },
         { els: section.querySelectorAll(".tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
-        { els: section.querySelectorAll(".portfolio-filters"), from: { y: -20 * distScale }, duration: 0.6 * durScale, ease: "power2.out" },
-        { els: section.querySelectorAll(".split-media, .service-media, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
+        { els: section.querySelectorAll(".split-media, .coverflow, .pf-carousel, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
         { els: section.querySelectorAll(".service-card, .contact-info, .google-rating-bar"), from: { y: -46 * distScale, scale: 0.95 }, duration: 0.9 * durScale, ease: "back.out(1.25)", stagger: 0.12 },
-        { els: section.querySelectorAll(".masonry-grid .portfolio-item"), from: { y: -60 * distScale, scale: 0.94, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 0.9 * durScale, ease: "back.out(1.2)", stagger: 0.07 },
         { els: section.querySelectorAll(".btn"), from: { y: -18 * distScale }, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }
       ].filter(function (g) { return g.els.length; });
 
@@ -339,11 +337,9 @@
     };
     var socialFloats = [document.getElementById("facebook-float"), document.getElementById("instagram-float"), document.getElementById("whatsapp-float")].filter(Boolean);
 
-    if (reduceMotion) {
-      if (socialFloats.length) gsap.set(socialFloats, { opacity: 1, clearProps: "transform" });
-      return;
-    }
-
+    // Always plays, even with reduce-motion enabled at the OS level — this is
+    // a one-shot entrance flourish (not a scroll-jacked/looping effect), and
+    // OS-level "reduce animations" toggles have silently swallowed it before.
     gsap.set(heroTargets.decor, { opacity: 0, scale: 0.92 });
     gsap.set(heroWords, { opacity: 0, y: -60 * distScale, rotation: -3 });
     gsap.set(heroTargets.tagline, { opacity: 0, y: -26 * distScale });
@@ -460,9 +456,75 @@
   // Reviews — slow, steady pace long enough per card for a visitor to read the text.
   initMarquee(document.getElementById("reviews-marquee"), document.getElementById("reviews-track"), 13);
 
-  // Service showcases (Tatuagens / Piercings) — calm photo-reel pace.
-  document.querySelectorAll(".service-media-marquee").forEach(function (viewport) {
-    initMarquee(viewport, viewport.querySelector(".service-media-track"), 5.5);
+  /* ---------- Services coverflow (Tatuagens / Piercings) ---------- */
+  document.querySelectorAll("[data-coverflow]").forEach(function (root) {
+    var slides = Array.prototype.slice.call(root.querySelectorAll(".coverflow-slide"));
+    if (!slides.length) return;
+    var active = 0;
+    var spacing = isMobile ? 96 : 150;
+
+    function render(animate) {
+      slides.forEach(function (slide, i) {
+        var offset = i - active;
+        var dist = Math.abs(offset);
+        var vars = {
+          x: offset * spacing,
+          scale: dist === 0 ? 1 : Math.max(0.7, 1 - dist * 0.16),
+          rotationY: Math.max(-30, Math.min(30, offset * -20)),
+          opacity: dist > 2 ? 0 : 1,
+          zIndex: 100 - dist,
+          duration: animate ? 0.55 : 0,
+          ease: "power3.out"
+        };
+        if (animate) { gsap.to(slide, vars); } else { gsap.set(slide, vars); }
+      });
+    }
+
+    gsap.set(slides, { xPercent: 0 });
+    render(false);
+
+    root.querySelectorAll(".coverflow-arrow").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var dir = parseInt(btn.dataset.dir, 10);
+        active = (active + dir + slides.length) % slides.length;
+        render(true);
+      });
+    });
+
+    slides.forEach(function (slide, i) {
+      slide.addEventListener("click", function () {
+        if (i === active) return;
+        active = i;
+        render(true);
+      });
+
+      var inner = slide.querySelector(".coverflow-slide-inner");
+      if (reduceMotion) return;
+
+      if (isFinePointer) {
+        var quickRX = gsap.quickTo(inner, "rotationX", { duration: 0.4, ease: "power2.out" });
+        var quickRY = gsap.quickTo(inner, "rotationY", { duration: 0.4, ease: "power2.out" });
+        var quickScale = gsap.quickTo(inner, "scale", { duration: 0.4, ease: "power2.out" });
+        slide.addEventListener("mousemove", function (e) {
+          var rect = slide.getBoundingClientRect();
+          var px = (e.clientX - rect.left) / rect.width - 0.5;
+          var py = (e.clientY - rect.top) / rect.height - 0.5;
+          quickRY(px * 18);
+          quickRX(-py * 18);
+          quickScale(1.06);
+        });
+        slide.addEventListener("mouseleave", function () {
+          quickRX(0); quickRY(0); quickScale(1);
+        });
+      } else {
+        slide.addEventListener("touchstart", function () {
+          gsap.to(inner, { scale: 1.06, duration: 0.25, ease: "power2.out" });
+        }, { passive: true });
+        slide.addEventListener("touchend", function () {
+          gsap.to(inner, { scale: 1, rotationX: 0, rotationY: 0, duration: 0.3, ease: "power2.out" });
+        }, { passive: true });
+      }
+    });
   });
 
   /* ---------- Ripple effect ---------- */
@@ -480,48 +542,20 @@
     });
   });
 
-  /* ---------- Portfolio filter + lightbox ---------- */
-  var filterBtns = document.querySelectorAll(".filter-btn");
-  var portfolioItems = document.querySelectorAll(".portfolio-item");
-  var emptyMsg = document.querySelector(".portfolio-empty");
-
-  function applyFilter(filter) {
-    var visibleCount = 0;
-    portfolioItems.forEach(function (item) {
-      var match = filter === "all" || item.dataset.category.split(" ").indexOf(filter) !== -1;
-      item.classList.toggle("is-hidden", !match);
-      if (match) visibleCount++;
-    });
-    emptyMsg.hidden = visibleCount !== 0;
-  }
-
-  filterBtns.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      filterBtns.forEach(function (b) { b.classList.remove("is-active"); b.setAttribute("aria-selected", "false"); });
-      btn.classList.add("is-active");
-      btn.setAttribute("aria-selected", "true");
-      applyFilter(btn.dataset.filter);
-    });
-  });
-
+  /* ---------- Portfolio lightbox (shared modal) ---------- */
   var lightbox = document.getElementById("lightbox");
   var lightboxImg = document.getElementById("lightbox-img");
   var lightboxClose = document.getElementById("lightbox-close");
   var lightboxPrev = document.getElementById("lightbox-prev");
   var lightboxNext = document.getElementById("lightbox-next");
-  var currentIndex = 0;
+  var lightboxItems = [];
+  var lightboxIndex = 0;
 
-  function visibleItems() {
-    return Array.prototype.filter.call(portfolioItems, function (item) {
-      return !item.classList.contains("is-hidden");
-    });
-  }
-
-  function openLightbox(index) {
-    var items = visibleItems();
+  function openLightbox(items, index) {
     if (!items.length) return;
-    currentIndex = (index + items.length) % items.length;
-    var img = items[currentIndex].querySelector("img");
+    lightboxItems = items;
+    lightboxIndex = (index + items.length) % items.length;
+    var img = lightboxItems[lightboxIndex];
     lightboxImg.src = img.src;
     lightboxImg.alt = img.alt;
     lightbox.hidden = false;
@@ -533,23 +567,167 @@
     document.body.style.overflow = "";
   }
 
-  portfolioItems.forEach(function (item, idx) {
-    item.addEventListener("click", function () {
-      var items = visibleItems();
-      openLightbox(items.indexOf(item));
-    });
-  });
+  function stepLightbox(dir) {
+    if (!lightboxItems.length) return;
+    openLightbox(lightboxItems, lightboxIndex + dir);
+  }
 
   lightboxClose.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", function (e) { if (e.target === lightbox) closeLightbox(); });
-  lightboxPrev.addEventListener("click", function () { openLightbox(currentIndex - 1); });
-  lightboxNext.addEventListener("click", function () { openLightbox(currentIndex + 1); });
+  lightboxPrev.addEventListener("click", function () { stepLightbox(-1); });
+  lightboxNext.addEventListener("click", function () { stepLightbox(1); });
   document.addEventListener("keydown", function (e) {
     if (lightbox.hidden) return;
     if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowLeft") openLightbox(currentIndex - 1);
-    if (e.key === "ArrowRight") openLightbox(currentIndex + 1);
+    if (e.key === "ArrowLeft") stepLightbox(-1);
+    if (e.key === "ArrowRight") stepLightbox(1);
   });
+
+  /* ---------- Portfolio coverflow carousel ---------- */
+  (function initPortfolioCarousel() {
+    var root = document.getElementById("pf-carousel");
+    if (!root) return;
+    var track = document.getElementById("pf-track");
+    var cards = Array.prototype.slice.call(track.querySelectorAll(".pf-card"));
+    if (!cards.length) return;
+    var bgLayers = Array.prototype.slice.call(root.querySelectorAll(".pf-carousel-bg-layer"));
+    var dotsWrap = document.getElementById("pf-dots");
+    var statusEl = document.getElementById("pf-status");
+    var prevBtn = root.querySelector(".pf-prev");
+    var nextBtn = root.querySelector(".pf-next");
+    var images = cards.map(function (card) { return card.querySelector("img"); });
+
+    var active = 0;
+    var bgActiveLayer = 0;
+    var spacing = isMobile ? 128 : 210;
+    var autoplayDelay = 5200;
+    var autoplayTimer = null;
+    var hovering = false;
+
+    cards.forEach(function (card, i) {
+      var dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "pf-dot";
+      dot.setAttribute("aria-label", "Ir para trabalho " + (i + 1) + " de " + cards.length);
+      dot.addEventListener("click", function () { goTo(i); });
+      dotsWrap.appendChild(dot);
+    });
+    var dots = Array.prototype.slice.call(dotsWrap.children);
+
+    function updateBg(index) {
+      var nextLayerIdx = 1 - bgActiveLayer;
+      var nextLayer = bgLayers[nextLayerIdx];
+      nextLayer.style.backgroundImage = "url('" + images[index].src + "')";
+      bgLayers.forEach(function (l) { l.classList.remove("is-active"); });
+      nextLayer.classList.add("is-active");
+      bgActiveLayer = nextLayerIdx;
+    }
+
+    function render(animate) {
+      cards.forEach(function (card, i) {
+        var offset = i - active;
+        var dist = Math.abs(offset);
+        var vars = reduceMotion
+          ? { x: 0, y: 0, scale: 1, rotationY: 0, opacity: dist === 0 ? 1 : 0, zIndex: 100 - dist, duration: animate ? 0.35 : 0, ease: "power1.out" }
+          : {
+              x: offset * spacing,
+              y: dist === 0 ? 0 : 12,
+              scale: dist === 0 ? 1 : (dist === 1 ? 0.85 : 0.7),
+              rotationY: Math.max(-24, Math.min(24, offset * -14)),
+              opacity: dist > 2 ? 0 : (dist === 0 ? 1 : (dist === 1 ? 0.82 : 0.55)),
+              zIndex: 100 - dist,
+              duration: animate ? 0.85 : 0,
+              ease: "cubic-bezier(0.22, 1, 0.36, 1)"
+            };
+        card.classList.toggle("is-active", i === active);
+        card.setAttribute("aria-hidden", dist > 2 ? "true" : "false");
+        card.tabIndex = dist > 2 ? -1 : 0;
+        if (animate) { gsap.to(card, vars); } else { gsap.set(card, vars); }
+      });
+      dots.forEach(function (dot, i) { dot.classList.toggle("is-active", i === active); });
+      updateBg(active);
+      if (statusEl) statusEl.textContent = "Imagem " + (active + 1) + " de " + cards.length;
+    }
+
+    function goTo(index, animate) {
+      active = (index + cards.length) % cards.length;
+      render(animate !== false);
+      restartAutoplay();
+    }
+    function next() { goTo(active + 1); }
+    function prev() { goTo(active - 1); }
+
+    render(false);
+
+    prevBtn.addEventListener("click", prev);
+    nextBtn.addEventListener("click", next);
+
+    cards.forEach(function (card, i) {
+      card.addEventListener("click", function (e) {
+        if (i !== active) {
+          e.preventDefault();
+          goTo(i);
+        } else {
+          openLightbox(images, i);
+        }
+      });
+    });
+
+    root.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); prev(); }
+      if (e.key === "ArrowRight") { e.preventDefault(); next(); }
+    });
+
+    function startAutoplay() {
+      if (reduceMotion || hovering) return;
+      stopAutoplay();
+      autoplayTimer = setInterval(next, autoplayDelay);
+    }
+    function stopAutoplay() { if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; } }
+    function restartAutoplay() { startAutoplay(); }
+
+    root.addEventListener("mouseenter", function () { hovering = true; stopAutoplay(); });
+    root.addEventListener("mouseleave", function () { hovering = false; startAutoplay(); });
+    root.addEventListener("focusin", function () { hovering = true; stopAutoplay(); });
+    root.addEventListener("focusout", function () { hovering = false; startAutoplay(); });
+    startAutoplay();
+
+    // Drag (mouse/trackpad) + touch swipe
+    var dragStartX = 0;
+    var dragging = false;
+    track.addEventListener("pointerdown", function (e) {
+      dragging = true;
+      dragStartX = e.clientX;
+      track.classList.add("is-dragging");
+      stopAutoplay();
+      if (track.setPointerCapture) track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener("pointerup", function (e) {
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove("is-dragging");
+      var delta = e.clientX - dragStartX;
+      if (Math.abs(delta) > 40) { delta < 0 ? next() : prev(); }
+      restartAutoplay();
+    });
+    track.addEventListener("pointercancel", function () {
+      dragging = false;
+      track.classList.remove("is-dragging");
+      restartAutoplay();
+    });
+
+    // Wheel: only acts while the pointer is over the carousel, one slide per
+    // gesture with a cooldown — never blocks normal page scroll.
+    var wheelCooldown = false;
+    root.addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      if (wheelCooldown) return;
+      wheelCooldown = true;
+      e.deltaX > 0 ? next() : prev();
+      setTimeout(function () { wheelCooldown = false; }, 500);
+    }, { passive: false });
+  })();
 
   /* ---------- Back to top ---------- */
   var backToTop = document.getElementById("back-to-top");

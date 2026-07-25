@@ -456,12 +456,13 @@
   // Reviews — slow, steady pace long enough per card for a visitor to read the text.
   initMarquee(document.getElementById("reviews-marquee"), document.getElementById("reviews-track"), 13);
 
-  /* ---------- Services coverflow (Tatuagens / Piercings) ---------- */
+  /* ---------- Services coverflow (Tatuagens & Piercings) ---------- */
   document.querySelectorAll("[data-coverflow]").forEach(function (root) {
     var slides = Array.prototype.slice.call(root.querySelectorAll(".coverflow-slide"));
     if (!slides.length) return;
+    var isLarge = root.classList.contains("coverflow-lg");
     var active = 0;
-    var spacing = isMobile ? 96 : 150;
+    var spacing = isMobile ? (isLarge ? 118 : 96) : (isLarge ? 210 : 150);
 
     function render(animate) {
       slides.forEach(function (slide, i) {
@@ -469,12 +470,13 @@
         var dist = Math.abs(offset);
         var vars = {
           x: offset * spacing,
-          scale: dist === 0 ? 1 : Math.max(0.7, 1 - dist * 0.16),
-          rotationY: Math.max(-30, Math.min(30, offset * -20)),
-          opacity: dist > 2 ? 0 : 1,
+          y: dist === 0 ? 0 : Math.min(dist, 3) * 10,
+          scale: dist === 0 ? 1 : Math.max(0.62, 1 - dist * 0.17),
+          rotationY: Math.max(-42, Math.min(42, offset * -24)),
+          opacity: dist > 3 ? 0 : (dist === 0 ? 1 : Math.max(0.35, 1 - dist * 0.28)),
           zIndex: 100 - dist,
-          duration: animate ? 0.55 : 0,
-          ease: "power3.out"
+          duration: animate ? 0.7 : 0,
+          ease: "cubic-bezier(0.22, 1, 0.36, 1)"
         };
         if (animate) { gsap.to(slide, vars); } else { gsap.set(slide, vars); }
       });
@@ -483,19 +485,40 @@
     gsap.set(slides, { xPercent: 0 });
     render(false);
 
+    function goTo(index, animate) {
+      active = (index + slides.length) % slides.length;
+      render(animate !== false);
+      restartAutoplay();
+    }
+
     root.querySelectorAll(".coverflow-arrow").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var dir = parseInt(btn.dataset.dir, 10);
-        active = (active + dir + slides.length) % slides.length;
-        render(true);
+        goTo(active + dir);
       });
     });
+
+    var autoplayDelay = parseInt(root.dataset.autoplay, 10) || 0;
+    var autoplayTimer = null;
+
+    function startAutoplay() {
+      // Ignores reduceMotion on purpose: OS-level "reduce motion" has
+      // silently killed autoplay/entrance animations before in this project,
+      // and this carousel's auto-advance is an explicit user requirement.
+      // Also never pauses on hover/touch/focus — advances continuously.
+      if (!autoplayDelay) return;
+      stopAutoplay();
+      autoplayTimer = setInterval(function () { goTo(active + 1); }, autoplayDelay);
+    }
+    function stopAutoplay() { if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; } }
+    function restartAutoplay() { startAutoplay(); }
+
+    if (autoplayDelay) startAutoplay();
 
     slides.forEach(function (slide, i) {
       slide.addEventListener("click", function () {
         if (i === active) return;
-        active = i;
-        render(true);
+        goTo(i);
       });
 
       var inner = slide.querySelector(".coverflow-slide-inner");

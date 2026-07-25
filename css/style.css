@@ -79,20 +79,13 @@
   background: var(--bg);
   z-index: -1;
 }
-/* Hero + Sobre share ONE uncropped photo of Fran as a continuous backdrop.
-   background-size is "100% auto" (not cover) so the photo is never cropped
-   or zoomed — it renders at its true aspect ratio, full site width, anchored
-   to the top, running down through the Hero and into the Sobre section. */
-.hero-about-frame {
-  position: relative;
-}
-.hero-about-frame::before {
+/* Hero's own backdrop photo of Fran tattooing — Sobre goes back to the plain
+   starfield (via its shared ::before + the fixed body::before cosmic-bg).
+   background-size "100% auto" (not cover) so the photo is never cropped. */
+#hero::before {
   content: '';
   position: absolute;
-  top: 0; left: 50%;
-  width: 100vw;
-  height: 100%;
-  transform: translateX(-50%);
+  inset: 0;
   background-image: url('../assets/img/hero-fran-photo.webp');
   background-size: 100% auto;
   background-position: top center;
@@ -621,25 +614,21 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 
 /* ============ Services ============ */
 .services-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  display: flex;
+  justify-content: center;
   margin-top: 56px;
 }
 /* No card box here on purpose — photos float directly on the section
    background, each with its own shadow (see .coverflow-slide), no
    surrounding border/background/container. */
-.service-card { text-align: center; }
-.service-body { padding: 0 16px; }
-.service-body h3 { font-size: 1.6rem; margin-bottom: 10px; }
-.service-body p { color: var(--gray); margin-bottom: 18px; }
+.service-card { text-align: center; width: 100%; max-width: 980px; }
 
 /* ============ Services coverflow ============ */
 .coverflow {
   position: relative;
   height: 340px;
   margin-top: 16px;
-  perspective: 1200px;
+  perspective: 1400px;
 }
 .coverflow-track {
   position: relative;
@@ -657,6 +646,21 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   overflow: hidden;
   box-shadow: 0 20px 40px -16px rgba(0,0,0,0.65);
   cursor: pointer;
+}
+.coverflow-lg { height: 460px; }
+.coverflow-lg .coverflow-slide {
+  width: 260px;
+  height: 340px;
+  margin: -170px 0 0 -130px;
+  box-shadow: 0 26px 54px -18px rgba(0,0,0,0.7);
+}
+@media (max-width: 900px) {
+  .coverflow-lg { height: 380px; }
+  .coverflow-lg .coverflow-slide { width: 210px; height: 280px; margin: -140px 0 0 -105px; }
+}
+@media (max-width: 640px) {
+  .coverflow-lg { height: 320px; }
+  .coverflow-lg .coverflow-slide { width: 168px; height: 224px; margin: -112px 0 0 -84px; }
 }
 .coverflow-slide-inner { width: 100%; height: 100%; will-change: transform; }
 .coverflow-slide-inner img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
@@ -1123,19 +1127,20 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   .split-media, .split-text { order: initial; }
   .split-media { max-width: 380px; margin: 0 auto 40px; }
 
-  .services-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 640px) {
-  /* The photo is nearly square, but a phone's Hero is very tall (100vh) —
-     "100% auto" would leave most of the Hero photo-less. Cover the whole
-     Hero+Sobre frame instead, same as it looked before this was uncropped
-     for desktop. */
-  .hero-about-frame::before {
-    background-size: cover;
-    background-position: 62% 15%;
+  /* Phone Hero is very tall (100vh) vs. the nearly-square photo — "cover"
+     was cropping off Fran's hands/tattoo machine. Use "contain" instead so
+     the whole photo always stays visible with zero cropping; the empty
+     space below it is filled with the same dark tone as the rest of the
+     site and covered by the existing gradient/hero content. */
+  #hero::before {
+    background-size: contain;
+    background-position: top center;
+    background-color: var(--obsidian);
   }
   .section { padding: 90px 6vw; }
   .reviews-marquee { margin: 0 -6vw 20px; padding: 4px 6vw; }

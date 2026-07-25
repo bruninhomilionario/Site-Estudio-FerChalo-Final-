@@ -209,8 +209,10 @@
     // .greview-text is intentionally excluded: those cards get cloned by the
     // infinite marquee below, and cloning would bake in whatever mid-reveal
     // opacity the words had at that moment, leaving half the loop stuck dim.
+    // Headings are excluded too — they get the fancier per-character converge
+    // effect below instead of the plain word fade.
     var revealEls = document.querySelectorAll(
-      "#sobre .section-heading, #sobre .section-body, #servicos .section-heading, #portfolio .section-heading, #avaliacoes .section-heading, #estudio .section-heading, #estudio .section-body, #estudio .check-list li, .cta-heading, .cta-text, #contato .section-heading"
+      "#sobre .section-body, #estudio .section-body, #estudio .check-list li, .cta-text"
     );
     revealEls.forEach(function (el) {
       var words = prepareRevealWords(el);
@@ -228,15 +230,68 @@
         }
       });
     });
-    ScrollTrigger.refresh();
   }
 
-  /* ---------- Hero background video ---------- */
-  (function initHeroVideo() {
-    var heroVideo = document.getElementById("hero-video");
-    if (!heroVideo) return;
-    heroVideo.play().catch(function () {});
-  })();
+  /* ---------- Scroll "converge" heading effect ----------
+     Splits each big section heading into per-character spans. Every
+     character starts offset sideways and rotated in 3D based on its
+     distance from the middle of the string, then converges to its natural
+     position as the heading scrolls through view — characters further from
+     the center travel further, so the whole line "assembles" as you scroll. */
+  function prepareRevealChars(el) {
+    var frag = document.createDocumentFragment();
+    var targets = [];
+    Array.prototype.forEach.call(el.childNodes, function (node) {
+      if (node.nodeType === 3) {
+        node.textContent.split("").forEach(function (ch) {
+          if (ch === " ") {
+            frag.appendChild(document.createTextNode(" "));
+            return;
+          }
+          var span = document.createElement("span");
+          span.className = "reveal-char";
+          span.textContent = ch;
+          frag.appendChild(span);
+          targets.push(span);
+        });
+      } else {
+        var clone = node.cloneNode(true);
+        frag.appendChild(clone);
+        if (node.nodeType === 1 && node.tagName !== "BR") targets.push(clone);
+      }
+    });
+    el.innerHTML = "";
+    el.appendChild(frag);
+    return targets;
+  }
+
+  if (!reduceMotion) {
+    var headingEls = document.querySelectorAll(
+      "#sobre .section-heading, #servicos .section-heading, #portfolio .section-heading, #avaliacoes .section-heading, #estudio .section-heading, .cta-heading, #contato .section-heading"
+    );
+    headingEls.forEach(function (el) {
+      var chars = prepareRevealChars(el);
+      if (!chars.length) return;
+      var center = (chars.length - 1) / 2;
+      chars.forEach(function (ch, i) {
+        var dist = i - center;
+        gsap.set(ch, { x: dist * 16 * distScale, rotateX: dist * 8, opacity: 0.15 });
+      });
+      gsap.to(chars, {
+        x: 0,
+        rotateX: 0,
+        opacity: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 98%",
+          end: "top 20%",
+          scrub: 0.4
+        }
+      });
+    });
+    ScrollTrigger.refresh();
+  }
 
   /* ---------- Studio video: play/loop while scrolled into view ---------- */
   (function initStudioVideo() {

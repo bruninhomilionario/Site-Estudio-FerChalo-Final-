@@ -79,6 +79,26 @@
   background: var(--bg);
   z-index: -1;
 }
+/* Hero + Sobre share ONE uncropped photo of Fran as a continuous backdrop.
+   background-size is "100% auto" (not cover) so the photo is never cropped
+   or zoomed — it renders at its true aspect ratio, full site width, anchored
+   to the top, running down through the Hero and into the Sobre section. */
+.hero-about-frame {
+  position: relative;
+}
+.hero-about-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
+  background-image: url('../assets/img/hero-fran-photo.webp');
+  background-size: 100% auto;
+  background-position: top center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -251,8 +271,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   line-height: 1;
 }
 .logo-letters {
-  font-family: 'Bebas Neue', var(--font-display);
-  font-size: 1.7rem;
+  font-family: var(--font-signage);
+  font-size: 1.9rem;
   letter-spacing: 0.05em;
   color: var(--warm-white);
   text-shadow:
@@ -387,8 +407,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   margin-bottom: 24px;
   max-width: 720px;
+  perspective: 500px;
 }
 .section-heading.center { text-align: center; margin-left: auto; margin-right: auto; }
+.reveal-char { display: inline-block; }
 .section-body { color: var(--gray); max-width: 560px; font-size: 1.05rem; margin-bottom: 28px; }
 
 /* ============ Hero ============ */
@@ -398,20 +420,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   min-height: 640px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
-  background: radial-gradient(circle at 50% 30%, #18171B 0%, #0D0D0F 68%);
+  text-align: left;
   overflow: hidden;
-  padding: 0 5vw;
-}
-.hero-video-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
+  padding: 0 8vw;
 }
 .hero-decor {
   position: absolute;
@@ -442,14 +455,14 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   color: var(--gray);
   font-size: clamp(1rem, 1.6vw, 1.25rem);
   max-width: 620px;
-  margin: 0 auto 44px;
+  margin: 0 0 44px;
 }
-.hero-ctas { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 52px; }
+.hero-ctas { display: flex; gap: 18px; justify-content: flex-start; flex-wrap: wrap; margin-bottom: 52px; }
 .trust-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 28px;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: 0.8rem;
   color: var(--gray);
 }
@@ -484,8 +497,27 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .section-split.reverse .split-media { order: 2; }
 .section-split.reverse .split-text { order: 1; }
 
+/* Soft pulsing red "LED" glow behind Fran's portrait card in Sobre. */
+#sobre .split-media {
+  position: relative;
+}
+#sobre .split-media::before {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  background: radial-gradient(circle, rgba(163,52,75,0.65) 0%, rgba(163,52,75,0.3) 45%, transparent 72%);
+  filter: blur(36px);
+  z-index: 0;
+  animation: portrait-led-pulse 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes portrait-led-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
 .portrait-frame {
   position: relative;
+  z-index: 1;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -786,7 +818,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   color: var(--warm-white);
 }
 .cta-ribbon { width: 200px; height: 40px; margin: 0 auto 24px; display: block; }
-.cta-heading { font-family: var(--font-signage); font-size: clamp(2rem, 4.4vw, 3.4rem); margin-bottom: 20px; color: var(--warm-white); }
+.cta-heading { font-family: var(--font-signage); font-size: clamp(2rem, 4.4vw, 3.4rem); margin-bottom: 20px; color: var(--warm-white); perspective: 500px; }
 .cta-text { color: #C7BEB5; max-width: 560px; margin: 0 auto 40px; }
 .cta-banner .btn-primary { background: var(--ruby-burgundy); }
 .cta-banner .btn-primary:hover { background: #BD405A; }
@@ -850,13 +882,10 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .footer-copy { text-align: center; color: var(--gray-dim); font-size: 0.78rem; border-top: 1px solid var(--border); padding-top: 24px; }
 
 /* ============ WhatsApp float / back to top ============ */
-/* Shifted a bit further from the edge (46px instead of 26px) so the
-   WhatsApp icon fully covers the decorative sparkle in the cosmic
-   background that used to peek out just to its left. */
 #whatsapp-float {
   position: fixed;
   bottom: 26px;
-  right: 46px;
+  right: 20px;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -873,7 +902,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 #instagram-float {
   position: fixed;
   bottom: 96px;
-  right: 46px;
+  right: 20px;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -890,7 +919,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 #facebook-float {
   position: fixed;
   bottom: 166px;
-  right: 46px;
+  right: 20px;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -907,7 +936,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 #back-to-top {
   position: fixed;
   bottom: 26px;
-  right: 114px;
+  right: 88px;
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -975,9 +1004,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   .google-rating-bar { justify-content: center; text-align: center; }
   .hero-ctas { flex-direction: column; width: 100%; }
   .hero-ctas .btn { width: 100%; }
-  #back-to-top { right: 110px; width: 40px; height: 40px; }
-  #whatsapp-float { width: 52px; height: 52px; bottom: 20px; right: 40px; }
-  #instagram-float { width: 52px; height: 52px; bottom: 84px; right: 40px; }
-  #facebook-float { width: 52px; height: 52px; bottom: 148px; right: 40px; }
+  #back-to-top { right: 84px; width: 40px; height: 40px; }
+  #whatsapp-float { width: 52px; height: 52px; bottom: 20px; right: 16px; }
+  #instagram-float { width: 52px; height: 52px; bottom: 84px; right: 16px; }
+  #facebook-float { width: 52px; height: 52px; bottom: 148px; right: 16px; }
   .cta-banner { padding: 70px 6vw; }
 }

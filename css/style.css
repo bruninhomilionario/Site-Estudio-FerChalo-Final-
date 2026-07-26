@@ -498,6 +498,42 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 @keyframes bob { 0%,100% { transform: translate(-50%, 0);} 50% { transform: translate(-50%, 8px);} }
 
+/* ============ Flowing text ribbon ("correnteza") ============ */
+.flow-ribbon {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 0;
+  background: linear-gradient(90deg, rgba(122,36,53,0.18), rgba(163,52,75,0.06) 50%, rgba(122,36,53,0.18));
+  border-top: 1px solid var(--dark-border);
+  border-bottom: 1px solid var(--dark-border);
+}
+.flow-track {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+}
+.flow-track span {
+  font-family: var(--font-signage);
+  font-size: clamp(1.15rem, 2.6vw, 2rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(247,243,237,0.6);
+}
+.flow-track span.flow-dot {
+  color: var(--ruby-burgundy);
+  -webkit-text-stroke: 0;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+@media (max-width: 640px) {
+  .flow-ribbon { padding: 14px 0; }
+  .flow-track { gap: 20px; }
+}
+
 /* ============ Split sections ============ */
 .section-split {
   display: grid;
@@ -968,6 +1004,49 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   border-top: 1px solid rgba(33,28,21,0.08);
 }
 .greview-source svg { width: 14px; height: 14px; }
+
+/* ============ Real Google review screenshots ============ */
+.gproof {
+  margin-top: 44px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.gproof-heading {
+  font-family: var(--font-signage);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  color: var(--warm-white);
+  margin-bottom: 8px;
+}
+.gproof-heading span { color: var(--gold); }
+.gproof-sub { color: var(--gray-dim); font-size: 0.88rem; margin-bottom: 30px; }
+.gproof-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+.gproof-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  box-shadow: 0 12px 28px -18px rgba(0,0,0,0.5);
+  transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+.gproof-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@media (hover: hover) and (pointer: fine) {
+  .gproof-card:hover { transform: translateY(-6px) scale(1.02); border-color: var(--ruby-burgundy); box-shadow: 0 20px 40px -16px rgba(163,52,75,0.35); }
+}
+.gproof-card:active { transform: scale(0.97); }
+.gproof-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 900px) {
+  .gproof-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .gproof-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .gproof { margin-top: 34px; padding-top: 30px; }
+}
 
 /* ============ CTA banner ============ */
 .cta-banner {

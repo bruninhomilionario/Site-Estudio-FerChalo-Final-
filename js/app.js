@@ -138,8 +138,8 @@
     document.querySelectorAll("[data-fade], .cta-banner").forEach(function (section) {
       var groups = [
         { els: section.querySelectorAll(".section-label"), from: { y: -22 * distScale }, duration: 0.6, ease: "power2.out" },
-        { els: section.querySelectorAll(".tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
-        { els: section.querySelectorAll(".split-media, .coverflow, .pf-carousel, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
+        { els: section.querySelectorAll(".tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line, .gproof-heading, .gproof-sub"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
+        { els: section.querySelectorAll(".split-media, .coverflow, .pf-carousel, .reviews-marquee, .contact-map, .gproof-grid"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
         { els: section.querySelectorAll(".service-card, .contact-info, .google-rating-bar"), from: { y: -46 * distScale, scale: 0.95 }, duration: 0.9 * durScale, ease: "back.out(1.25)", stagger: 0.12 },
         { els: section.querySelectorAll(".btn"), from: { y: -18 * distScale }, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }
       ].filter(function (g) { return g.els.length; });
@@ -291,17 +291,19 @@
     ScrollTrigger.refresh();
   }
 
-  /* ---------- Studio video: play/loop while scrolled into view ---------- */
+  /* ---------- Studio video: pause when scrolled out of view ----------
+     No longer auto-plays on scroll-in — browsers block autoplay-with-sound
+     unless it's triggered by a real user gesture, and a silent autoplay
+     defeats the point of having audio. Playback now only starts when the
+     visitor presses the native play button, which counts as that gesture,
+     so the sound plays normally every time. Auto-pausing on scroll-out is
+     kept so it doesn't keep playing audio off-screen once started. */
   (function initStudioVideo() {
     var studioVideo = document.getElementById("studio-video");
     if (!studioVideo) return;
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          studioVideo.play().catch(function () {});
-        } else {
-          studioVideo.pause();
-        }
+        if (!entry.isIntersecting) studioVideo.pause();
       });
     }, { threshold: 0.4 });
     observer.observe(studioVideo);
@@ -447,6 +449,8 @@
 
   // Reviews — slow, steady pace long enough per card for a visitor to read the text.
   initMarquee(document.getElementById("reviews-marquee"), document.getElementById("reviews-track"), 13);
+  // "Correnteza" flowing text ribbon — purely decorative, so a brisk continuous pace works.
+  initMarquee(document.querySelector(".flow-ribbon"), document.getElementById("flow-track"), 1.4);
 
   /* ---------- Services coverflow (Tatuagens & Piercings) ---------- */
   document.querySelectorAll("[data-coverflow]").forEach(function (root) {
@@ -597,6 +601,17 @@
     if (e.key === "ArrowLeft") stepLightbox(-1);
     if (e.key === "ArrowRight") stepLightbox(1);
   });
+
+  /* ---------- Real Google review screenshots (lightbox grid) ---------- */
+  (function initGoogleProofGrid() {
+    var grid = document.getElementById("gproof-grid");
+    if (!grid) return;
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".gproof-card"));
+    var images = cards.map(function (card) { return card.querySelector("img"); });
+    cards.forEach(function (card, i) {
+      card.addEventListener("click", function () { openLightbox(images, i); });
+    });
+  })();
 
   /* ---------- Portfolio coverflow carousel ---------- */
   (function initPortfolioCarousel() {

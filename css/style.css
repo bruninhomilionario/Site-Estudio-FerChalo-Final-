@@ -39,9 +39,10 @@
   --radius-sm: 10px;
   --font-display: 'Cormorant Garamond', serif;
   --font-body: 'Manrope', sans-serif;
-  /* Pirata One reserved for big signage-style titles only (hero + section
-     headings) — everything else uses the regular site fonts above. */
+  /* Pirata One kept for the logo/nav only — big titles (Hero heading,
+     section headings, CTA heading) now use Raleway instead. */
   --font-signage: 'Pirata One', serif;
+  --font-heading: 'Raleway', sans-serif;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --container: 1240px;
 }
@@ -78,17 +79,27 @@
   background: var(--bg);
   z-index: -1;
 }
-/* Hero's own backdrop photo of Fran tattooing — Sobre goes back to the plain
-   starfield (via its shared ::before + the fixed body::before cosmic-bg).
-   background-size "100% auto" (not cover) so the photo is never cropped. */
-#hero::before {
-  content: '';
+/* Background videos for Portfolio/Estudio — sit behind the section's own
+   ::before (the translucent --bg tint above), which darkens them for
+   text readability, same full-bleed sizing as that pseudo-element. */
+.section-bg-video {
+  position: absolute;
+  top: 0; left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
+  object-fit: cover;
+  z-index: -2;
+  pointer-events: none;
+}
+/* Hero's own backdrop video of Fran tattooing — Sobre goes back to the plain
+   starfield (via its shared ::before + the fixed body::before cosmic-bg). */
+.hero-bg-video {
   position: absolute;
   inset: 0;
-  background-image: url('../assets/img/hero-fran-photo.webp');
-  background-size: 100% auto;
-  background-position: top center;
-  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   z-index: -1;
 }
 
@@ -406,7 +417,9 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 .text-flourish-end { margin: 10px 0 0; }
 .heading-heart { width: 0.62em; height: auto; vertical-align: middle; margin-left: 0.15em; position: relative; top: -0.05em; }
 .section-heading {
-  font-family: var(--font-signage);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--warm-white);
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   margin-bottom: 24px;
   max-width: 720px;
@@ -440,7 +453,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 .hero-content { position: relative; z-index: 2; max-width: 900px; color: var(--warm-white); }
 .hero-heading {
-  font-family: var(--font-signage);
+  font-family: var(--font-heading);
+  font-weight: 800;
   font-size: clamp(2.6rem, 7vw, 6.2rem);
   letter-spacing: 0.01em;
   margin-bottom: 48px;
@@ -559,7 +573,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   border: 1px solid var(--gold-soft);
   border-radius: calc(var(--radius-md) - 6px);
 }
-.portrait-placeholder img {
+.portrait-placeholder img,
+.portrait-placeholder video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -609,7 +624,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   width: 100%;
   padding: 0 20px;
   text-align: center;
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
+  font-weight: 700;
   font-size: 1.4rem;
   color: var(--warm-white);
   letter-spacing: 0.03em;
@@ -900,7 +916,7 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   color: var(--warm-white);
 }
 .cta-ribbon { width: 200px; height: 40px; margin: 0 auto 24px; display: block; }
-.cta-heading { font-family: var(--font-signage); font-size: clamp(2rem, 4.4vw, 3.4rem); margin-bottom: 20px; color: var(--warm-white); perspective: 500px; }
+.cta-heading { font-family: var(--font-heading); font-weight: 700; font-size: clamp(2rem, 4.4vw, 3.4rem); margin-bottom: 20px; color: var(--warm-white); perspective: 500px; }
 .cta-text { color: #C7BEB5; max-width: 560px; margin: 0 auto 40px; }
 .cta-banner .btn-primary { background: var(--ruby-burgundy); }
 .cta-banner .btn-primary:hover { background: #BD405A; }
@@ -1088,15 +1104,6 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
 }
 
 @media (max-width: 640px) {
-  /* Phone Hero is very tall (100vh) vs. the nearly-square photo — "cover"
-     was cropping off Fran's hands/tattoo machine. Use "contain" instead so
-     the whole photo always stays visible with zero cropping; the empty
-     space below/around it shows the site's starry cosmic background
-     (body::before) instead of a flat color. */
-  #hero::before {
-    background-size: contain;
-    background-position: top center;
-  }
   /* Hero's height was rigidly locked to 100vh with overflow hidden — with
      the new two-line heading + subheading + description + badges, content
      no longer reliably fits a short phone viewport and was getting clipped

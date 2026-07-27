@@ -667,15 +667,17 @@
       return out;
     }
 
-    cardEls.forEach(function (card, i) {
-      var dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "pf-fan-dot";
-      dot.setAttribute("aria-label", "Ir para trabalho " + (i + 1) + " de " + total);
-      dot.addEventListener("click", function () { goTo(i); });
-      dotsWrap.appendChild(dot);
-    });
-    var dots = Array.prototype.slice.call(dotsWrap.children);
+    if (dotsWrap) {
+      cardEls.forEach(function (card, i) {
+        var dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "pf-fan-dot";
+        dot.setAttribute("aria-label", "Ir para trabalho " + (i + 1) + " de " + total);
+        dot.addEventListener("click", function () { goTo(i); });
+        dotsWrap.appendChild(dot);
+      });
+    }
+    var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.children) : [];
 
     function updateDots() { dots.forEach(function (dot, i) { dot.classList.toggle("is-active", i === centerIndex); }); }
     function updateStatus() { if (statusEl) statusEl.textContent = "Imagem " + (centerIndex + 1) + " de " + total; }
@@ -826,8 +828,8 @@
 
     render();
 
-    prevBtn.addEventListener("click", function () { cycle("left"); });
-    nextBtn.addEventListener("click", function () { cycle("right"); });
+    if (prevBtn) prevBtn.addEventListener("click", function () { cycle("left"); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { cycle("right"); });
 
     cardEls.forEach(function (card, i) {
       card.addEventListener("click", function () { goTo(i); });

@@ -139,7 +139,7 @@
       var groups = [
         { els: section.querySelectorAll(".section-label"), from: { y: -22 * distScale }, duration: 0.6, ease: "power2.out" },
         { els: section.querySelectorAll(".tag-list, address, .contact-phone, .contact-rating, .business-hours, .hours-note, .google-rating-line"), from: { y: -30 * distScale }, duration: 0.8 * durScale, ease: "power2.out", stagger: 0.08 },
-        { els: section.querySelectorAll(".split-media, .coverflow, .pf-fan, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
+        { els: section.querySelectorAll(".split-media, .coverflow, .pf-marquee, .reviews-marquee, .contact-map"), from: { y: -70 * distScale, scale: 0.96, rotation: -2, filter: "blur(" + blurPx + "px)" }, duration: 1.1 * durScale, ease: "back.out(1.15)" },
         { els: section.querySelectorAll(".service-card, .contact-info, .google-rating-bar"), from: { y: -46 * distScale, scale: 0.95 }, duration: 0.9 * durScale, ease: "back.out(1.25)", stagger: 0.12 },
         { els: section.querySelectorAll(".btn"), from: { y: -18 * distScale }, duration: 0.55 * durScale, ease: "back.out(1.2)", stagger: 0.08 }
       ].filter(function (g) { return g.els.length; });
@@ -594,272 +594,28 @@
     if (e.key === "ArrowRight") stepLightbox(1);
   });
 
-  /* ---------- Portfolio fan carousel ----------
-     A stack of cards fanned out around a center card, GSAP-animated: only
-     a window of 7 (of the full set) is ever visible/positioned at once,
-     rotating circularly as the visitor pages through. Hovering a card (fine
-     pointers only) pushes its neighbors apart, similar to spreading a hand
-     of playing cards. */
-  (function initPortfolioFan() {
-    var root = document.getElementById("pf-fan");
-    if (!root) return;
-    var track = document.getElementById("pf-fan-track");
-    var cardEls = Array.prototype.slice.call(track.querySelectorAll(".pf-fan-card"));
-    if (!cardEls.length) return;
-    var images = cardEls.map(function (card) { return card.querySelector("img"); });
-    var dotsWrap = document.getElementById("pf-fan-dots");
-    var statusEl = document.getElementById("pf-fan-status");
-    var prevBtn = root.querySelector(".pf-fan-prev");
-    var nextBtn = root.querySelector(".pf-fan-next");
-
-    var total = cardEls.length;
-    var MAX_VISIBLE = 7;
-    var HALF = 3;
-    var FAN_POSITIONS = [
-      { rot: -21, scale: 0.7756, x: -30, y: 7.3, z: 1 },
-      { rot: -14, scale: 0.8498, x: -22, y: 4.0, z: 2 },
-      { rot: -7, scale: 0.9346, x: -11, y: 1.3, z: 3 },
-      { rot: 0, scale: 1.0, x: 0, y: 0.0, z: 10 },
-      { rot: 7, scale: 0.9346, x: 11, y: 1.3, z: 3 },
-      { rot: 14, scale: 0.8498, x: 22, y: 4.0, z: 2 },
-      { rot: 21, scale: 0.7756, x: 30, y: 7.3, z: 1 }
-    ];
-    var needsPagination = total > MAX_VISIBLE;
-    var centerIndex = needsPagination ? HALF : (total >> 1);
-    var animating = false;
-    var hasEntered = false;
-    var direction = null;
-    var prevVisible = {};
-    var hoverCleanup = null;
-    var autoplayTimer = null;
-    var hovering = false;
-
-    function respMult(w) {
-      if (w < 480) return 0.55;
-      if (w < 640) return 0.62;
-      if (w < 768) return 0.72;
-      if (w < 1024) return 0.85;
-      return 1.0;
-    }
-    function slotConfig(slotCount, slot) {
-      if (slotCount >= MAX_VISIBLE) return FAN_POSITIONS[slot];
-      var center = slotCount >> 1;
-      var distance = slotCount > 1 ? (slot - center) / center : 0;
-      var abs = Math.abs(distance);
-      return { rot: distance * 21, scale: 1 - 0.2244 * abs * abs, x: distance * 30, y: abs * abs * 7.3, z: 10 - Math.abs(slot - center) };
-    }
-    function getVisibleMap(center) {
-      var map = {};
-      if (!needsPagination) {
-        cardEls.forEach(function (_, i) { map[i] = i; });
-        return map;
-      }
-      for (var slot = 0; slot < MAX_VISIBLE; slot++) {
-        var idx = ((center + slot - HALF) % total + total) % total;
-        map[idx] = slot;
-      }
-      return map;
-    }
-    function extend(a, b) {
-      var out = {};
-      for (var k in a) out[k] = a[k];
-      for (var k2 in b) out[k2] = b[k2];
-      return out;
-    }
-
-    if (dotsWrap) {
-      cardEls.forEach(function (card, i) {
-        var dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "pf-fan-dot";
-        dot.setAttribute("aria-label", "Ir para trabalho " + (i + 1) + " de " + total);
-        dot.addEventListener("click", function () { goTo(i); });
-        dotsWrap.appendChild(dot);
-      });
-    }
-    var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.children) : [];
-
-    function updateDots() { dots.forEach(function (dot, i) { dot.classList.toggle("is-active", i === centerIndex); }); }
-    function updateStatus() { if (statusEl) statusEl.textContent = "Imagem " + (centerIndex + 1) + " de " + total; }
-
-    function render() {
-      var visibleMap = getVisibleMap(centerIndex);
-      var isFirst = !hasEntered;
-      var animate = !reduceMotion;
-      var mult = respMult(window.innerWidth);
-      var slotCount = needsPagination ? MAX_VISIBLE : total;
-      var remaining = Object.keys(visibleMap).length;
-
-      if (animate && isFirst) animating = true;
-      function done() {
-        remaining--;
-        if (remaining <= 0) {
-          animating = false;
-          if (isFirst) hasEntered = true;
-        }
-      }
-
-      cardEls.forEach(function (card, i) {
-        var slot = visibleMap[i];
-        var wasVisible = Object.prototype.hasOwnProperty.call(prevVisible, i);
-        card.setAttribute("aria-hidden", slot === undefined ? "true" : "false");
-        card.tabIndex = slot === undefined ? -1 : 0;
-
-        if (slot !== undefined) {
-          var c = slotConfig(slotCount, slot);
-          var target = { x: (c.x * mult) + "rem", y: (c.y * mult) + "rem", rotation: c.rot, scale: c.scale, opacity: 1, zIndex: c.z };
-          if (!animate) {
-            gsap.set(card, target);
-            done();
-          } else if (isFirst) {
-            gsap.set(card, { x: 0, y: "9rem", rotation: 0, scale: 0.5, opacity: 0 });
-            gsap.to(card, extend(target, { duration: 1.1, ease: "elastic.out(1.05,0.78)", delay: 0.15 + slot * 0.05, onComplete: done }));
-          } else if (!wasVisible) {
-            var enterX = direction === "right" ? 36 : -36;
-            gsap.set(card, { x: enterX + "rem", y: (c.y * mult) + "rem", rotation: direction === "right" ? 28 : -28, scale: 0.5, opacity: 0 });
-            gsap.to(card, extend(target, { duration: 0.55, ease: "power2.out", onComplete: done }));
-          } else {
-            gsap.to(card, extend(target, { duration: 0.5, ease: "power2.out", onComplete: done }));
-          }
-        } else if (wasVisible) {
-          if (!animate) { gsap.set(card, { opacity: 0, scale: 0.5, zIndex: 0 }); }
-          else {
-            var exitX = direction === "right" ? -36 : 36;
-            gsap.to(card, { x: exitX + "rem", opacity: 0, scale: 0.5, rotation: direction === "right" ? -28 : 28, duration: 0.35, ease: "power2.in", zIndex: 0 });
-          }
-        } else if (isFirst) {
-          gsap.set(card, { opacity: 0, scale: 0.3, x: 0, y: 0, zIndex: 0 });
-        }
-      });
-
-      prevVisible = visibleMap;
-      updateDots();
-      updateStatus();
-      setupHover(visibleMap, slotCount, mult);
-    }
-
-    function setupHover(visibleMap, slotCount, mult) {
-      if (hoverCleanup) { hoverCleanup(); hoverCleanup = null; }
-      if (reduceMotion || !isFinePointer) return;
-
-      var entries = [];
-      cardEls.forEach(function (el, i) {
-        var slot = visibleMap[i];
-        if (slot !== undefined) entries.push({ el: el, slot: slot });
-      });
-      entries.sort(function (a, b) { return a.slot - b.slot; });
-
-      var activeSlot = null;
-      var leaveTimer = null;
-      var centerSlot = entries.length >> 1;
-
-      function updateHoverLayout(hoveredSlot) {
-        entries.forEach(function (entry) {
-          var base = slotConfig(slotCount, entry.slot);
-          var targetX = base.x * mult;
-          var targetY = base.y * mult;
-          var targetRot = base.rot;
-          var targetScale = base.scale;
-          var delay = 0;
-
-          if (hoveredSlot !== null) {
-            var distance = Math.abs(entry.slot - hoveredSlot);
-            delay = distance * 0.02;
-            if (entry.slot === hoveredSlot) {
-              targetY -= 1.8 * mult;
-              targetScale *= 1.1;
-            } else {
-              var normalized = centerSlot > 0 ? (entry.slot - centerSlot) / centerSlot : 0;
-              var pushStrength = 7 * (1 - Math.abs(normalized)) * (1 + 0.2 * Math.max(0, 3 - distance));
-              if (entry.slot < hoveredSlot) { targetX -= pushStrength * mult; targetRot -= 3 / (distance + 1); }
-              else { targetX += pushStrength * mult; targetRot += 3 / (distance + 1); }
-            }
-          } else {
-            delay = Math.abs(entry.slot - centerSlot) * 0.02;
-          }
-
-          gsap.to(entry.el, { x: targetX + "rem", y: targetY + "rem", rotation: targetRot, scale: targetScale, duration: 0.45, delay: delay, ease: "elastic.out(1,0.75)", overwrite: "auto" });
-          gsap.set(entry.el, { zIndex: base.z });
-        });
-      }
-
-      var handlers = entries.map(function (entry) {
-        var handler = function () {
-          if (animating) return;
-          if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = null; }
-          if (activeSlot !== entry.slot) { activeSlot = entry.slot; updateHoverLayout(entry.slot); }
-        };
-        entry.el.addEventListener("mouseenter", handler);
-        return { el: entry.el, handler: handler };
-      });
-
-      function onLeave() {
-        if (animating) return;
-        if (leaveTimer) clearTimeout(leaveTimer);
-        leaveTimer = setTimeout(function () { activeSlot = null; updateHoverLayout(null); }, 50);
-      }
-      root.addEventListener("mouseleave", onLeave);
-
-      hoverCleanup = function () {
-        handlers.forEach(function (h) { h.el.removeEventListener("mouseenter", h.handler); });
-        root.removeEventListener("mouseleave", onLeave);
-        if (leaveTimer) clearTimeout(leaveTimer);
-      };
-    }
-
-    function cycle(dir) {
-      if (animating || !needsPagination) return;
-      direction = dir;
-      centerIndex = dir === "right" ? (centerIndex + 1) % total : (centerIndex - 1 + total) % total;
-      render();
-      restartAutoplay();
-    }
-
-    function goTo(index) {
-      if (index === centerIndex) { openLightbox(images, index); return; }
-      if (animating) return;
-      var diffForward = (index - centerIndex + total) % total;
-      var diffBackward = (centerIndex - index + total) % total;
-      direction = diffForward <= diffBackward ? "right" : "left";
-      centerIndex = index;
-      render();
-      restartAutoplay();
-    }
-
-    render();
-
-    if (prevBtn) prevBtn.addEventListener("click", function () { cycle("left"); });
-    if (nextBtn) nextBtn.addEventListener("click", function () { cycle("right"); });
-
-    cardEls.forEach(function (card, i) {
-      card.addEventListener("click", function () { goTo(i); });
+  /* ---------- Portfolio marquee ----------
+     Same continuous auto-scrolling carousel mechanic as the Reviews section
+     (initMarquee): cards duplicated once for a seamless loop, pauses on
+     hover/focus. Clicking a card opens it in the shared lightbox — uses a
+     delegated click listener keyed off data-index so it still works after
+     initMarquee clones the cards. */
+  (function initPortfolioMarquee() {
+    var viewport = document.getElementById("pf-marquee");
+    var track = document.getElementById("pf-track");
+    if (!viewport || !track) return;
+    var images = Array.prototype.slice.call(track.querySelectorAll(".pf-card")).map(function (card) {
+      return card.querySelector("img");
     });
 
-    root.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowLeft") { e.preventDefault(); cycle("left"); }
-      if (e.key === "ArrowRight") { e.preventDefault(); cycle("right"); }
+    viewport.addEventListener("click", function (e) {
+      var card = e.target.closest(".pf-card");
+      if (!card) return;
+      var idx = parseInt(card.dataset.index, 10);
+      if (!isNaN(idx)) openLightbox(images, idx);
     });
 
-    var autoplayDelay = 4500;
-    function startAutoplay() {
-      if (reduceMotion || hovering || !needsPagination) return;
-      stopAutoplay();
-      autoplayTimer = setInterval(function () { cycle("right"); }, autoplayDelay);
-    }
-    function stopAutoplay() { if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; } }
-    function restartAutoplay() { startAutoplay(); }
-
-    root.addEventListener("mouseenter", function () { hovering = true; stopAutoplay(); });
-    root.addEventListener("mouseleave", function () { hovering = false; startAutoplay(); });
-    root.addEventListener("focusin", function () { hovering = true; stopAutoplay(); });
-    root.addEventListener("focusout", function () { hovering = false; startAutoplay(); });
-    startAutoplay();
-
-    var resizeTimer;
-    window.addEventListener("resize", function () {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function () { if (!animating) render(); }, 200);
-    });
+    initMarquee(viewport, track, 4);
   })();
 
   /* ---------- Back to top ---------- */
